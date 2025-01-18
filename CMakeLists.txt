@@ -4,3 +4,6 @@ project(AttackOnPaxos)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(AttackOnPaxos main.cpp)
+
+
+add_subdirectory(Node)
