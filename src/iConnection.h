@@ -1,4 +1,3 @@
-
 #ifndef ICONNECTION_H
 #define ICONNECTION_H
 
