@@ -20,9 +20,9 @@ void TryConnection()
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
-    // hints.ai_flags = AI_PASSIVE;
+    hints.ai_flags = AI_PASSIVE;
 
-    if(( status = getaddrinfo("www.google.com","8080",&hints, &servinfo)) != 0){
+    if(( status = getaddrinfo(NULL,"3490",&hints, &servinfo)) != 0){
         std::cout<<"getaddrinfo error:"<< gai_strerror(status)<<"\n";
         return;
     }
@@ -48,7 +48,14 @@ void TryConnection()
         inet_ntop(p->ai_family, addr, ipstr, sizeof(ipstr));
         std::cout<<ipver<<": "<<ipstr<<"\n" ;
     }
+    int sockfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
 
+
+    if(status = bind(sockfd, servinfo->ai_addr,INET6_ADDRSTRLEN) != 0)
+    {
+        std::cout << "bind error:" << gai_strerror(status) << "\n";
+        return;
+    }
 
     freeaddrinfo(servinfo);
 }
