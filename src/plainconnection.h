@@ -57,6 +57,17 @@ void TryConnection()
         return;
     }
 
+
+    if(status = listen(sockfd, 10) != 0)
+    {
+        std::cout << "listen error:" << gai_strerror(status) <<"\n";
+        return;
+    }
+
+    struct sockaddr_storage client_addr;
+    socklen_t client_addr_size = sizeof client_addr;
+    int new_socketfd = accept(sockfd, reinterpret_cast<struct sockaddr*>(&client_addr), &client_addr_size);
+
     freeaddrinfo(servinfo);
 }
 
