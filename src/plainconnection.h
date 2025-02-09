@@ -66,7 +66,23 @@ void TryConnection()
 
     struct sockaddr_storage client_addr;
     socklen_t client_addr_size = sizeof client_addr;
-    int new_socketfd = accept(sockfd, reinterpret_cast<struct sockaddr*>(&client_addr), &client_addr_size);
+    int new_socketfd;
+
+    if((new_socketfd = accept(sockfd, reinterpret_cast<struct sockaddr*>(&client_addr), &client_addr_size)) == -1)
+    {
+        int err = errno;
+        std::cout <<"accept error: " << strerror(err)<<"\n";
+        return;
+    }
+
+    char* msg = "Hello Paxos!";
+
+    const int len = strlen(msg);
+    int bytes_sent = send(new_socketfd, msg, len, 0);
+
+
+    std::cout<<"total byes sent"<< bytes_sent <<"\n";
+
 
     freeaddrinfo(servinfo);
 }
