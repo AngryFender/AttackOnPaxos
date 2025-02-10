@@ -3,14 +3,19 @@
 
 #include <cstring>
 #include <iostream>
+#include <sys/utsname.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-void TryConnection()
+void SetupSimpleServer()
 {
+    struct utsname unameData;
+    uname(&unameData);
+    std::cout<<"SERVER ⬢ " << unameData.nodename <<" \n";
+
     int status;
     struct addrinfo hints;
     struct addrinfo *servinfo;
@@ -85,6 +90,32 @@ void TryConnection()
 
 
     freeaddrinfo(servinfo);
+}
+
+
+void SetupSimpleClient()
+{
+    struct utsname unameData;
+    uname(&unameData);
+    std::cout<<"CLIENT ⬢ " << unameData.nodename <<" \n";
+
+    addrinfo hint;
+    hint.ai_family = AF_UNSPEC;
+    hint.ai_socktype = SOCK_STREAM;
+
+    addrinfo *servinfo;
+    int status;
+    if((status = getaddrinfo("angryfedora", "3490",&hint, &servinfo)) !=0){
+        std::cout<<"getaddrinfo error:"<< gai_strerror(status)<<"\n";
+        return;
+    }
+
+    int socketfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
+
+    std::cout<<"Attempting to connect\n";
+    connect(socketfd, servinfo->ai_addr, servinfo->ai_addrlen);
+
+
 }
 
 #endif //PLAINCONNECTION_H
