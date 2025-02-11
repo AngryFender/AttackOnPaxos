@@ -93,7 +93,7 @@ void SetupSimpleServer()
 }
 
 
-void SetupSimpleClient()
+void SetupSimpleClient(char* ipaddress)
 {
     struct utsname unameData;
     uname(&unameData);
@@ -105,7 +105,7 @@ void SetupSimpleClient()
 
     addrinfo *servinfo;
     int status;
-    if((status = getaddrinfo("angryfedora", "3490",&hint, &servinfo)) !=0){
+    if((status = getaddrinfo(ipaddress, "3490",&hint, &servinfo)) !=0){
         std::cout<<"getaddrinfo error:"<< gai_strerror(status)<<"\n";
         return;
     }
