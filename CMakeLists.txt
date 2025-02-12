@@ -8,4 +8,4 @@ add_executable(AttackOnPaxos main.cpp
         src/plainconnection.h)
 
 
-add_subdirectory(Node)
+#add_subdirectory(Node)

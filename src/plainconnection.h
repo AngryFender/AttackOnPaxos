@@ -116,6 +116,15 @@ void SetupSimpleClient(char* ipaddress)
     connect(socketfd, servinfo->ai_addr, servinfo->ai_addrlen);
 
 
+    char* message;
+    int len = 20;
+    if((recv(socketfd, message, len,0))==-1)
+    {
+        std::cout<<"recv error \n";
+    }
+    std::cout<<"received :"<<message<<"\n";
+
+
 }
 
 #endif //PLAINCONNECTION_H
