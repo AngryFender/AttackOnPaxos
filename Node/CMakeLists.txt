@@ -5,5 +5,4 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(Node main.cpp
         ../src/iConnection.h
-        ../src/plainconnection.h
         ../src/plainconnection.h)

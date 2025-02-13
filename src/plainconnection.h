@@ -102,6 +102,7 @@ void SetupSimpleClient(char* ipaddress)
     addrinfo hint;
     hint.ai_family = AF_UNSPEC;
     hint.ai_socktype = SOCK_STREAM;
+    hint.ai_flags = AI_V4MAPPED;
 
     addrinfo *servinfo;
     int status;
@@ -113,16 +114,19 @@ void SetupSimpleClient(char* ipaddress)
     int socketfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
 
     std::cout<<"Attempting to connect\n";
-    connect(socketfd, servinfo->ai_addr, servinfo->ai_addrlen);
 
-
-    char* message;
-    int len = 20;
-    if((recv(socketfd, message, len,0))==-1)
-    {
-        std::cout<<"recv error \n";
+    if(connect(socketfd, servinfo->ai_addr, servinfo->ai_addrlen)==-1){
+        std::cout<<"connect error "<<strerror(errno)<<"\n";
     }
-    std::cout<<"received :"<<message<<"\n";
+
+    char message[20];
+    int len = 20;
+    if ((recv(socketfd, message, len, 0)) == -1)
+    {
+        std::cout << "recv error " << strerror(errno) << "\n";
+        return;
+    }
+    std::cout << "received :" << message << "\n";
 
 
 }
