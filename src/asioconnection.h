@@ -2,19 +2,25 @@
 #define ASIOCONNECTION_H
 
 #include <iostream>
+#include <string>
+#include <ctime>
+#include <iostream>
+#include <boost/asio.hpp>
+
+using boost::asio::ip::tcp;
 
 void SetupAsioClient(const char* ipAddress)
 {
     try
     {
-        boost::asio::io_service io_service;
-        tcp::resolver resolver(io_service);
+        boost::asio::io_context io_context;
+        tcp::resolver resolver(io_context);
 
         tcp::resolver::query query(ipAddress,"daytime");
         tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
         tcp::resolver::iterator end;
 
-        tcp::socker socket(io_service);
+        tcp::socker socket(io_context);
         boost::system::error_code error= boost::asio::error::host_not_found;
         while(error && endpoint_iterator != end)
         {
@@ -51,5 +57,33 @@ void SetupAsioClient(const char* ipAddress)
     }
 }
 
+std::string makeDateTimeString()
+{
+    const time_t now = std::time(nullptr);
+    return ctime(&now);
+}
+
+void SetupAsioServer()
+{
+    try
+    {
+        boost::asio::io_context io_context;
+        tcp::acceptor acceptor(io_context, tcp::endpoint(tcpv4()), 4000);
+
+        while (1)
+        {
+            tcp::socket socket(io_context);
+            acceptor.accept(socket);
+
+            std::string message = makeDateTimeString();
+            boost::system::error_code ignored_error;
+            boost::asio::write(socket, boost::asio::buffer(message), ignored_error);
+        }
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << e.what() << "\n";
+    }
+}
 
 #endif //ASIOCONNECTION_H
