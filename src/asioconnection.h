@@ -86,4 +86,50 @@ void SetupAsioServer()
     }
 }
 
+class TcpServer
+{
+    boost::io_context _io_context;
+    tcp::acceptor _acceptor;
+public:
+    TcpServer(boost::io_context &io_context) : _io_context(io_context), _acceptor(io_context, tcp::endpoint(tcp::v4(),4000))
+    {
+       start_accept();
+    }
+private:
+    void start_accept()
+    {
+        TcpConnection::pointer new_connection= TcpConnection::create(io_context);
+        _acceptor.async_accept(new_connection->socket(), [this, new_connection](boost::asio::placeholders::error)
+        {
+            this->handle_accept(new_connection);
+        });
+    }
+
+    void handle_accept(TcpConnection::pointer new_connection)
+    {
+        if(!error)
+        {
+            new_connection->start();
+        }
+
+        start_accept();
+    }
+};
+
+
+void SetupAsioServerAsync()
+{
+    try
+    {
+        boost::io_context io_context;
+        TcpServer server(io_context);
+        io_context.run();
+    }
+    catch(std::exception& e)
+    {
+       std::cerr << e.what() << "\n" ;
+    }
+}
+
+
 #endif //ASIOCONNECTION_H
