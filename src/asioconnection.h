@@ -86,15 +86,14 @@ void SetupAsioServer()
     }
 }
 
-class tcp_connection
-  : public boost::enable_shared_from_this<tcp_connection>
+class TcpConnection: public boost::enable_shared_from_this<TcpConnection>
 {
 public:
-  typedef boost::shared_ptr<tcp_connection> pointer;
+  typedef boost::shared_ptr<TcpConnection> pointer;
 
   static pointer create(boost::asio::io_service& io_service)
   {
-    return pointer(new tcp_connection(io_service));
+    return pointer(new TcpConnection(io_service));
   }
 
   tcp::socket& socket()
@@ -107,13 +106,13 @@ public:
     message_ = make_daytime_string();
 
     boost::asio::async_write(socket_, boost::asio::buffer(message_),
-        boost::bind(&tcp_connection::handle_write, shared_from_this(),
+        boost::bind(&TcpConnection::handle_write, shared_from_this(),
           boost::asio::placeholders::error,
           boost::asio::placeholders::bytes_transferred));
   }
 
 private:
-  tcp_connection(boost::asio::io_service& io_service)
+  TcpConnection(boost::asio::io_service& io_service)
     : socket_(io_service)
   {
   }
