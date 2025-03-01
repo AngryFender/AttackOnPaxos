@@ -8,5 +8,8 @@ add_executable(AttackOnPaxos main.cpp
         src/plainconnection.h
         src/asioconnection.h)
 
-
+find_package(Boost 1.74.0 REQUIRED)
+if (Boost_FOUND)
+    target_include_directories(${PROJECT_NAME} PUBLIC ${Boost_INCLUDE_DIRS})
+endif()
 #add_subdirectory(Node)

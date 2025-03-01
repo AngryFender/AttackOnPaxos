@@ -1,8 +1,11 @@
 #include <iostream>
-#include "src/plainconnection.h"
+//#include "src/plainconnection.h"
+
+
+
 int main()
 {
     std::cout << "Attack on Paxos!" << std::endl;
-    SetupSimpleServer();
+    //SetupSimpleServer();
     return 0;
 }
