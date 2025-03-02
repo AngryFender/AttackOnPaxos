@@ -1,11 +1,13 @@
 #ifndef ASIOCONNECTION_H
 #define ASIOCONNECTION_H
 
+#include <ctime>
 #include <iostream>
 #include <string>
 #include <ctime>
 #include <iostream>
 #include <boost/asio.hpp>
+#include <boost/array.hpp>
 
 using boost::asio::ip::tcp;
 
@@ -20,12 +22,12 @@ void SetupAsioClient(const char* ipAddress)
         tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
         tcp::resolver::iterator end;
 
-        tcp::socker socket(io_context);
+        tcp::socket socket(io_context);
         boost::system::error_code error= boost::asio::error::host_not_found;
         while(error && endpoint_iterator != end)
         {
             socket.close();
-            socker.connect(*endpoint_iterator++, error);
+            socket.connect(*endpoint_iterator++, error);
         }
 
         if(error)
@@ -85,11 +87,17 @@ void SetupAsioServer()
         std::cerr << e.what() << "\n";
     }
 }
+std::string make_daytime_string()
+{
+    using namespace std;
+    time_t now = time(0);
+    return ctime(&now);
+}
 
-class TcpConnection: public boost::enable_shared_from_this<TcpConnection>
+class TcpConnection: public std::enable_shared_from_this<TcpConnection>
 {
 public:
-  typedef boost::shared_ptr<TcpConnection> pointer;
+  typedef std::shared_ptr<TcpConnection> pointer;
 
   static pointer create(boost::asio::io_service& io_service)
   {
@@ -106,7 +114,7 @@ public:
     message_ = make_daytime_string();
 
     boost::asio::async_write(socket_, boost::asio::buffer(message_),
-        boost::bind(&TcpConnection::handle_write, shared_from_this(),
+        std::bind(&TcpConnection::handle_write, shared_from_this(),
           boost::asio::placeholders::error,
           boost::asio::placeholders::bytes_transferred));
   }
@@ -128,24 +136,22 @@ private:
 
 class TcpServer
 {
-    boost::io_context _io_context;
+    boost::asio::io_context _io_context;
     tcp::acceptor _acceptor;
 public:
-    TcpServer(boost::io_context &io_context) : _io_context(io_context), _acceptor(io_context, tcp::endpoint(tcp::v4(),4000))
+    TcpServer(boost::asio::io_context &io_context) : _io_context(io_context), _acceptor(io_context, tcp::endpoint(tcp::v4(),4000))
     {
        start_accept();
     }
 private:
     void start_accept()
     {
-        TcpConnection::pointer new_connection= TcpConnection::create(io_context);
-        _acceptor.async_accept(new_connection->socket(), [this, new_connection](boost::asio::placeholders::error)
-        {
-            this->handle_accept(new_connection);
-        });
+        TcpConnection::pointer new_connection= TcpConnection::create(_io_context);
+        _acceptor.async_accept(new_connection->socket(),
+        std::bind(&TcpServer::handle_accept, this, new_connection, boost::asio::placeholders::error));
     }
 
-    void handle_accept(TcpConnection::pointer new_connection)
+    void handle_accept(TcpConnection::pointer new_connection, const boost::system::error_code& error)
     {
         if(!error)
         {
@@ -161,7 +167,7 @@ void SetupAsioServerAsync()
 {
     try
     {
-        boost::io_context io_context;
+        boost::asio::io_context io_context;
         TcpServer server(io_context);
         io_context.run();
     }
