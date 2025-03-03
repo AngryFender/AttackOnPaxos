@@ -46,9 +46,9 @@ void SetupAsioClient(const char* ipAddress)
             {
                 break; //Connection closed cleanly by peer
             }
-            else
+            else if(error)
             {
-                throw boost::system::system(error);
+                throw boost::system::system_error(error);
             }
             std::cout.write(buf.data(),len);
         }
@@ -70,7 +70,7 @@ void SetupAsioServer()
     try
     {
         boost::asio::io_context io_context;
-        tcp::acceptor acceptor(io_context, tcp::endpoint(tcpv4()), 4000);
+        tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), 4000));
 
         while (1)
         {
@@ -136,10 +136,12 @@ private:
 
 class TcpServer
 {
-    boost::asio::io_context _io_context;
+    boost::asio::io_context& _io_context;
     tcp::acceptor _acceptor;
 public:
-    TcpServer(boost::asio::io_context &io_context) : _io_context(io_context), _acceptor(io_context, tcp::endpoint(tcp::v4(),4000))
+    TcpServer(boost::asio::io_context& io_context) :
+    _io_context(io_context),
+    _acceptor(io_context, tcp::endpoint(tcp::v4(),4000))
     {
        start_accept();
     }
