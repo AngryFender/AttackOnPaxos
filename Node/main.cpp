@@ -1,5 +1,6 @@
 #include <iostream>
-#include "../src/plainconnection.h"
+#include "../Shared/plainconnection.h"
+#include "../Shared/asioconnection.h"
 
 int main(int argc, char* argv[])
 {
@@ -11,7 +12,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    SetupSimpleClient(argv[1]);
-
+    //SetupSimpleClient(argv[1]);
+    SetupAsioClient(argv[1]);
     return 0;
 }

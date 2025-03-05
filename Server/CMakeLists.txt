@@ -4,9 +4,9 @@ project(AttackOnPaxos)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(AttackOnPaxos main.cpp
-        src/iConnection.h
-        #src/plainconnection.h
-        src/asioconnection.h)
+        ../Shared/iConnection.h
+        #../Shared/plainconnection.h
+        ../Shared/asioconnection.h)
 
 find_package(Boost 1.74.0 REQUIRED)
 if (Boost_FOUND)

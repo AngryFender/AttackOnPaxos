@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "src/asioconnection.h"
-//#include "src/plainconnection.h"
+#include "../Shared/asioconnection.h"
+//#include "../Shared/plainconnection.h"
 
 
 
