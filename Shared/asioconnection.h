@@ -18,7 +18,7 @@ void SetupAsioClient(const char* ipAddress)
         boost::asio::io_context io_context;
         tcp::resolver resolver(io_context);
 
-        tcp::resolver::query query(ipAddress,"daytime");
+        tcp::resolver::query query(ipAddress,"3490",boost::asio::ip::resolver_base::numeric_service);
         tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
         tcp::resolver::iterator end;
 
@@ -141,7 +141,7 @@ class TcpServer
 public:
     TcpServer(boost::asio::io_context& io_context) :
     _io_context(io_context),
-    _acceptor(io_context, tcp::endpoint(tcp::v4(),4000))
+    _acceptor(io_context, tcp::endpoint(tcp::v4(),3490))
     {
        start_accept();
     }
