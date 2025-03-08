@@ -6,7 +6,9 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(Node main.cpp
         ../Shared/iConnection.h
         ../Shared/plainconnection.h
-        ../Shared/ilogger.h)
+        ../Shared/ilogger.h
+        ../Shared/logger.cpp
+        ../Shared/logger.h)
 
 find_package(Boost 1.74.0 REQUIRED)
 if (Boost_FOUND)
