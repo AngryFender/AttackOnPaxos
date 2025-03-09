@@ -6,16 +6,19 @@
 
 class Logger: ILogger
 {
+private:
+     LogCallBack _debugCall;
+     LogCallBack _infoCall;
+     LogCallBack _warningCall;
+     LogCallBack _errorCall;
+     LogCallBack _fatalCall;
+
 public:
      Logger(std::string file);
      ~Logger() override;
-     ILogger& operator << (const char* message) override;
+     ILogger& operator <<(const char* message) override;
      ILogger& setLogLevel(const LogType& type) override;
-     void registerDebugCallback(LogDebug logDebug) override;
-     void registerInfoCallback(LogInfo logInfo) override;
-     void registerWarningCallback(LogWarning logWarning) override;
-     void registerErrorCallback(LogError logError) override;
-     void registerFatalCallback(LogFatal logFatal) override;
+     void registerDebugCallback(LogType& type, LogCallBack logCall) override;
 };
 
 
