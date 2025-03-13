@@ -4,6 +4,23 @@ Logger::~Logger()
 {
 }
 
+ILogger& Logger::getInstance()
+{
+    std::call_once(_initFlag, []()
+    {
+       _logger = std::unique_ptr<ILogger>(new Logger());
+    });
+    return *_logger;
+}
+
+void Logger::setInstance(std::unique_ptr<ILogger>&& logger)
+{
+    if(_logger == nullptr)
+    {
+        _logger = std::move(logger);
+    }
+}
+
 ILogger& Logger::operator<<(const char* message)
 {
     std::lock_guard<std::mutex> lockGuard(_mutex);
