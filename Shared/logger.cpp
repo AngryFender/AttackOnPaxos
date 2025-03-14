@@ -40,9 +40,10 @@ ILogger& Logger::setLogLevel(const LogType& type)
 {
     std::lock_guard<std::mutex> lockGuard(_mutex);
     _logType = type;
+    return *_logger;
 }
 
-void Logger::registerDebugCallback(LogType& type, LogCallBack logCall)
+void Logger::registerDebugCallback(LogType& type, const LogCallBack logCall)
 {
     std::lock_guard<std::mutex> lockGuard(_mutex);
     switch (type)
@@ -52,6 +53,6 @@ void Logger::registerDebugCallback(LogType& type, LogCallBack logCall)
     case WARNING: _warningCall = logCall; break;
     case ERROR:_errorCall = logCall; break;
     case FATAL:_fatalCall = logCall; break;
-    default:
+    default: break;
     }
 }
