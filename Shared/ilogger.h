@@ -3,7 +3,6 @@
 
 #include <functional>
 #include <string>
-typedef void (*LogCallBack)(const char* message);
 
 enum LogType
 {
@@ -20,7 +19,7 @@ public:
     virtual ~ILogger() = default;
     virtual ILogger& operator << (const char* message) = 0;
     virtual ILogger& setLogLevel(const LogType& type) = 0;
-    virtual bool registerCallback(LogType& type, std::function<void(const std::string& message)> LogCallBack);
+    virtual bool registerCallback(LogType& type, std::function<void(const std::string& message)> logCall);
 };
 
 #endif //ILOGGER_H

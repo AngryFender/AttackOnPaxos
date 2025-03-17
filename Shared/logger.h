@@ -2,6 +2,7 @@
 #define LOGGER_H
 #include <memory>
 #include <mutex>
+#include <functional>
 #include "ilogger.h"
 
 class Logger: ILogger
@@ -11,6 +12,8 @@ private:
      static inline std::once_flag _initFlag;
      std::mutex _mutex;
      LogType _logType;
+
+     typedef std::function<void(const std::string& message)> LogCallBack;
      LogCallBack _debugCall;
      LogCallBack _infoCall;
      LogCallBack _warningCall;
@@ -23,8 +26,7 @@ public:
      static void setInstance(std::unique_ptr<ILogger>&& logger);
      ILogger& operator <<(const char* message) override;
      ILogger& setLogLevel(const LogType& type) override;
-     void registerDebugCallback(LogType& type, LogCallBack logCall) override;
-
+     bool registerCallback(LogType& type, std::function<void(const std::string& message)> logCall) override;
 private:
      Logger() = default;
 };
