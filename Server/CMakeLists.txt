@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(AttackOnPaxos main.cpp
         ../Shared/iConnection.h
-        #../Shared/plainconnection.h
         ../Shared/asioconnection.h
         ../Shared/ilogger.h
         ../Shared/logger.cpp

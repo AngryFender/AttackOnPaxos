@@ -16,10 +16,14 @@ enum LogType
 class ILogger
 {
 public:
-    virtual ~ILogger() = default;
+    virtual ~ILogger();
     virtual ILogger& operator << (const char* message) = 0;
     virtual ILogger& setLogLevel(const LogType& type) = 0;
-    virtual bool registerCallback(LogType& type, std::function<void(const std::string& message)> logCall);
+    virtual bool registerCallback(const LogType type, const std::function<void(const std::string& message)> logCall) = 0;
 };
+
+inline ILogger::~ILogger()
+{
+}
 
 #endif //ILOGGER_H

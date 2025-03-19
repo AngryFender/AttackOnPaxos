@@ -8,6 +8,7 @@
 #include <iostream>
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
+#include "logger.h"
 
 using boost::asio::ip::tcp;
 
@@ -169,6 +170,7 @@ void SetupAsioServerAsync()
 {
     try
     {
+        Log(DEBUG)<<"Starting Asio Server";
         boost::asio::io_context io_context;
         TcpServer server(io_context);
         io_context.run();

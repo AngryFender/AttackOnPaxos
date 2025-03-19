@@ -5,7 +5,7 @@
 #include <functional>
 #include "ilogger.h"
 
-class Logger: ILogger
+class Logger: public ILogger
 {
 private:
      static inline std::unique_ptr<ILogger> _logger = nullptr;
@@ -26,7 +26,7 @@ public:
      static void setInstance(std::unique_ptr<ILogger>&& logger);
      ILogger& operator <<(const char* message) override;
      ILogger& setLogLevel(const LogType& type) override;
-     bool registerCallback(LogType& type, std::function<void(const std::string& message)> logCall) override;
+     bool registerCallback(LogType type, std::function<void(const std::string& message)> logCall) override;
 private:
      Logger() = default;
 };

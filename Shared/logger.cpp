@@ -43,7 +43,7 @@ ILogger& Logger::setLogLevel(const LogType& type)
     return *_logger;
 }
 
-bool Logger::registerCallback(LogType& type, std::function<void(const std::string& message)> logCall)
+bool Logger::registerCallback(const LogType type, const std::function<void(const std::string& message)> logCall)
 {
     std::lock_guard<std::mutex> lockGuard(_mutex);
     switch (type)
@@ -53,6 +53,7 @@ bool Logger::registerCallback(LogType& type, std::function<void(const std::strin
         case WARNING: _warningCall = logCall; break;
         case ERROR:_errorCall = logCall; break;
         case FATAL:_fatalCall = logCall; break;
-        default: break;
+        default: return false;
     }
+    return true;
 }
