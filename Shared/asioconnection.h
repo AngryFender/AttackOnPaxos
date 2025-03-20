@@ -170,14 +170,14 @@ void SetupAsioServerAsync()
 {
     try
     {
-        Log(DEBUG)<<"Starting Asio Server";
+        Log(DEBUG)<<"Starting Asio Server"<<"\n";
         boost::asio::io_context io_context;
         TcpServer server(io_context);
         io_context.run();
     }
     catch(std::exception& e)
     {
-       std::cerr << e.what() << "\n" ;
+        Log(ERROR)<<e.what()<<"\n";
     }
 }
 

@@ -10,14 +10,24 @@ void init()
     {
         std::cout<<message<<"\n";
     });
+
+    Logger::getInstance().registerCallback(LogType::INFO, [](const std::string& message)
+    {
+        std::cout<<message<<"\n";
+    });
+
+    Logger::getInstance().registerCallback(LogType::ERROR, [](const std::string& message)
+    {
+        std::cerr<<message<<"\n";
+    });
+
     SetupAsioServerAsync();
 }
 
-
 int main()
 {
-    std::cout << "Attack on Paxos!" << "\n";
     init();
+    Log(INFO)<< "Attack on Paxos!" << "\n";
 
     return 0;
 }
