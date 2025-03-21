@@ -36,7 +36,7 @@ void SetupAsioClient(const char* ipAddress)
             throw boost::system::system_error(error);
         }
 
-        while(1)
+        while(true)
         {
             boost::array<char, 128> buf;
             boost::system::error_code error;
@@ -140,9 +140,9 @@ class TcpServer
     boost::asio::io_context& _io_context;
     tcp::acceptor _acceptor;
 public:
-    TcpServer(boost::asio::io_context& io_context) :
-    _io_context(io_context),
-    _acceptor(io_context, tcp::endpoint(tcp::v4(),3490))
+    explicit TcpServer(boost::asio::io_context& io_context) :
+        _io_context(io_context),
+        _acceptor(io_context, tcp::endpoint(tcp::v4(), 3490))
     {
        start_accept();
     }
