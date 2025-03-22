@@ -150,8 +150,7 @@ private:
     void start_accept()
     {
         TcpConnection::pointer new_connection= TcpConnection::create(_io_context);
-        _acceptor.async_accept(new_connection->socket(),
-        std::bind(&TcpServer::handle_accept, this, new_connection, boost::asio::placeholders::error));
+        _acceptor.async_accept(new_connection->socket(), std::bind(&TcpServer::handle_accept, this, new_connection, boost::asio::placeholders::error));
     }
 
     void handle_accept(TcpConnection::pointer new_connection, const boost::system::error_code& error)
@@ -164,22 +163,5 @@ private:
         start_accept();
     }
 };
-
-
-void SetupAsioServerAsync()
-{
-    try
-    {
-        Log(DEBUG)<<"Starting Asio Server"<<"\n";
-        boost::asio::io_context io_context;
-        TcpServer server(io_context);
-        io_context.run();
-    }
-    catch(std::exception& e)
-    {
-        Log(ERROR)<<e.what()<<"\n";
-    }
-}
-
 
 #endif //ASIOCONNECTION_H
