@@ -8,7 +8,10 @@ add_executable(Node main.cpp
         ../Shared/plainconnection.h
         ../Shared/ilogger.h
         ../Shared/logger.cpp
-        ../Shared/logger.h)
+        ../Shared/logger.h
+        ../Shared/iacceptoradapter.h
+        ../Shared/isocketadapter.h
+)
 
 find_package(Boost 1.74.0 REQUIRED)
 if (Boost_FOUND)
