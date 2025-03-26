@@ -11,6 +11,8 @@ add_executable(AttackOnPaxos main.cpp
         ../Shared/logger.h
         ../Shared/iacceptoradapter.h
         ../Shared/isocketadapter.h
+        ../Shared/socketadapter.cpp
+        ../Shared/socketadapter.h
 )
 
 find_package(Boost 1.74.0 REQUIRED)
