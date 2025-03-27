@@ -13,6 +13,8 @@ add_executable(Node main.cpp
         ../Shared/isocketadapter.h
         ../Shared/socketadapter.cpp
         ../Shared/socketadapter.h
+        ../Shared/acceptoradapter.cpp
+        ../Shared/acceptoradapter.h
 )
 
 find_package(Boost 1.74.0 REQUIRED)

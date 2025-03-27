@@ -102,7 +102,7 @@ public:
 
   static pointer create(boost::asio::io_service& io_service)
   {
-    return pointer(new TcpConnection(io_service));
+    return pointer(std::make_shared<TcpConnection>(io_service));
   }
 
   tcp::socket& socket()
