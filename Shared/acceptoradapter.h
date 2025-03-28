@@ -6,7 +6,7 @@ class AcceptorAdapter : public IAcceptorAdapter
 {
 public:
     AcceptorAdapter(boost::asio::io_context& io_context, const boost::asio::ip::port_type portNo)
-        :_acceptor(io_context, tcp::endpoint(tcp::v4(), portNo))
+        :_io_context(io_context), _acceptor(io_context, tcp::endpoint(tcp::v4(), portNo))
     {
         init_socket();
     }
@@ -16,8 +16,9 @@ public:
     void handle_accept(error_code& error);
 
 private:
+    boost::asio::io_context& _io_context;
     tcp::acceptor _acceptor;
-
+    std::vector<std::shared_ptr<ISocketAdapter>> _connections;
 };
 
 
