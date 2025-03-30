@@ -17,7 +17,7 @@ void AcceptorAdapter::async_accept(std::shared_ptr<ISocketAdapter> socket, std::
 
 }
 
-void AcceptorAdapter::handle_accept( error_code& error)
+void AcceptorAdapter::handle_accept( const error_code& error)
 {
     //error handling
     init_socket();

@@ -13,7 +13,7 @@ public:
     ~AcceptorAdapter() override = default;
     void init_socket() override;
     void async_accept(std::shared_ptr<ISocketAdapter> socket, std::function<void(error_code& error)>) override;
-    void handle_accept(error_code& error);
+    void handle_accept(const error_code& error);
 
 private:
     boost::asio::io_context& _io_context;
