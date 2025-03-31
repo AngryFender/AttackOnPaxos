@@ -17,3 +17,13 @@ void SocketAdapter::async_write(const boost::asio::const_buffer& message,
 {
     _socket.async_write_some(message, callback);
 }
+
+std::shared_ptr<SocketAdapter> SocketAdapter::create(boost::asio::io_context& io_context)
+{
+    return std::make_shared<SocketAdapter>(io_context);
+}
+
+std::shared_ptr<SocketAdapter> SocketAdapter::get()
+{
+    return shared_from_this();
+}
