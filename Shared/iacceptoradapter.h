@@ -11,6 +11,7 @@ class IAcceptorAdapter
 public:
     virtual ~IAcceptorAdapter() = default;
     virtual void open() = 0;
+    virtual const std::vector<std::shared_ptr<ISocketAdapter>>& getConnections() const = 0;
 };
 
 #endif //IACCEPTORADAPTER_H

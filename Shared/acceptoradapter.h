@@ -1,6 +1,7 @@
 #ifndef ACCEPTORADAPTER_H
 #define ACCEPTORADAPTER_H
 #include "iacceptoradapter.h"
+#include "socketadapter.h"
 
 class AcceptorAdapter : public IAcceptorAdapter
 {
@@ -12,7 +13,8 @@ public:
     }
     ~AcceptorAdapter() override = default;
     void open() override;
-    void handle_accept(const error_code& error);
+    void handle_accept(const std::shared_ptr<SocketAdapter>& socketAdapter, const error_code& error);
+    const std::vector<std::shared_ptr<ISocketAdapter>>& getConnections() const override;
 
 private:
     boost::asio::io_context& _io_context;
