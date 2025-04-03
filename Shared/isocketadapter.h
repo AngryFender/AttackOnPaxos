@@ -12,6 +12,8 @@ public:
 
     virtual void async_read_some( const boost::asio::mutable_buffer& buffer , std::function<void(const boost::system::error_code&, std::size_t)> callback) = 0;
     virtual void async_write(const boost::asio::const_buffer& message, std::function<void(const boost::system::error_code&, std::size_t)> callback) = 0;
+    virtual void connect(const boost::asio::local::detail::endpoint& peer_endpoint, boost::system::error_code& ec) = 0;
+    virtual void close() = 0;
 };
 
 #endif //ISOCKETADAPTER_
