@@ -27,3 +27,13 @@ std::shared_ptr<SocketAdapter> SocketAdapter::get()
 {
     return shared_from_this();
 }
+
+void SocketAdapter::connect(const tcp::endpoint& peer_endpoint, boost::system::error_code& ec)
+{
+    _socket.connect( peer_endpoint, ec);
+}
+
+void SocketAdapter::close()
+{
+    _socket.close();
+}
