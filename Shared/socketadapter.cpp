@@ -28,9 +28,9 @@ std::shared_ptr<SocketAdapter> SocketAdapter::get()
     return shared_from_this();
 }
 
-void SocketAdapter::connect(const tcp::endpoint& peer_endpoint, boost::system::error_code& ec)
+void SocketAdapter::async_connect(const tcp::endpoint& peer_endpoint,const std::function<void(const boost::system::error_code&)> callback)
 {
-    _socket.connect( peer_endpoint, ec);
+    _socket.async_connect( peer_endpoint, callback);
 }
 
 void SocketAdapter::close()
