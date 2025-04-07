@@ -1,5 +1,6 @@
 #include "acceptoradapter.h"
 #include "socketadapter.h"
+#include "../Shared/logger.h"
 
 void AcceptorAdapter::open()
 {
@@ -19,6 +20,7 @@ void AcceptorAdapter::handle_accept(const std::shared_ptr<SocketAdapter>& socket
 
         std::string address = socketAdapter->getSocket().remote_endpoint().address().to_string();
         _connections[address] =  socketAdapter;
+        Log(DEBUG) << address.c_str() <<" has successfully connected\n";
     }
     open();
 }

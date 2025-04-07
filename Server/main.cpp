@@ -3,6 +3,9 @@
 #include "../Shared/asioconnection.h"
 #include "../Shared/ilogger.h"
 #include "../Shared/logger.h"
+#include "../Shared/acceptoradapter.h"
+
+#define PORTNO 3490
 
 void init_logs()
 {
@@ -23,13 +26,14 @@ void init_logs()
     Log(INFO) << "Attack on Paxos!" << "\n";
 }
 
+
 void init_tcp_server()
 {
     try
     {
         Log(INFO) << "Starting Server" << "\n";
         boost::asio::io_context io_context;
-        TcpServer server(io_context);
+        AcceptorAdapter acceptor(io_context, PORTNO);
         io_context.run();
     }
     catch (std::exception& e)
