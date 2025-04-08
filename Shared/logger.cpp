@@ -38,14 +38,14 @@ ILogger& Logger::operator<<(const char* message)
 
 ILogger& Logger::setLogLevel(const LogType& type)
 {
-    std::lock_guard<std::mutex> lockGuard(_mutex);
+    std::lock_guard lockGuard(_mutex);
     _logType = type;
     return *_logger;
 }
 
 bool Logger::registerCallback(const LogType type, const std::function<void(const std::string& message)> logCall)
 {
-    std::lock_guard<std::mutex> lockGuard(_mutex);
+    std::lock_guard lockGuard(_mutex);
     switch (type)
     {
         case DEBUG: _debugCall = logCall; break;

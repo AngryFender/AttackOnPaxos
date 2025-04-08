@@ -16,8 +16,6 @@ void AcceptorAdapter::handle_accept(const std::shared_ptr<SocketAdapter>& socket
     //error handling
     if(!error)
     {
-        //add thread synchronisation
-
         std::string address = socketAdapter->getSocket().remote_endpoint().address().to_string();
         _connections[address] =  socketAdapter;
         Log(DEBUG) << address.c_str() <<" has successfully connected\n";
@@ -27,7 +25,5 @@ void AcceptorAdapter::handle_accept(const std::shared_ptr<SocketAdapter>& socket
 
 const std::map<std::string, std::shared_ptr<ISocketAdapter>> AcceptorAdapter::getConnections() const
 {
-    //add thread synchronisation
-
     return _connections;
 }
