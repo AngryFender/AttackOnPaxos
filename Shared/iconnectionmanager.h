@@ -1,6 +1,8 @@
 #ifndef ICONNECTIONMANAGER_H
 #define ICONNECTIONMANAGER_H
 #include <map>
+#include <memory>
+#include "iconnectionmanager.h"
 #include "isocketadapter.h"
 
 class IConnectionManager

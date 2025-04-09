@@ -16,6 +16,8 @@ add_executable(Node main.cpp
         ../Shared/acceptoradapter.cpp
         ../Shared/acceptoradapter.h
         ../Shared/iconnectionmanager.h
+        ../Shared/connectionmanager.h
+        ../Shared/connectionmanager.cpp
 )
 
 find_package(Boost 1.74.0 REQUIRED)
