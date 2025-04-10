@@ -8,6 +8,7 @@ public:
     ~ConnectionManager() override = default;
     void AddConnection(std::shared_ptr<ISocketAdapter> socketAdapter) override;
     void RemoveConnection(const std::string address) override;
+    bool ConnectionManager::GetConnection(const std::string address, std::shared_ptr<ISocketAdapter>& socketAdapter) const override;
     std::map<std::string, std::shared_ptr<ISocketAdapter>> GetConnections() const override;
 
 private:
