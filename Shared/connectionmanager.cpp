@@ -26,7 +26,7 @@ void ConnectionManager::RemoveConnection(const std::string address)
 
 bool ConnectionManager::GetConnection(const std::string address, std::shared_ptr<ISocketAdapter>& socketAdapter) const
 {
-    std::shared_mutex lock(_mutex);
+    std::shared_lock lock(_mutex);
     const auto it = _connections.find(address);
     if(it != _connections.end())
     {
@@ -38,6 +38,6 @@ bool ConnectionManager::GetConnection(const std::string address, std::shared_ptr
 
 std::map<std::string, std::shared_ptr<ISocketAdapter>> ConnectionManager::GetConnections() const
 {
-    std::shared_mutex lock(_mutex);
+    std::shared_lock lock(_mutex);
     return _connections;
 }

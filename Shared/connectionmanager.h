@@ -6,16 +6,22 @@
 class ConnectionManager: public IConnectionManager
 {
 public:
-    ~ConnectionManager() override = default;
     explicit ConnectionManager(boost::asio::io_context& io_context,const std::string& port): _resolver(io_context), _port(port)
     {
-
     };
 
     void AddConnection(std::shared_ptr<ISocketAdapter> socketAdapter) override;
     void RemoveConnection(const std::string address) override;
     bool GetConnection(const std::string address, std::shared_ptr<ISocketAdapter>& socketAdapter) const override;
     std::map<std::string, std::shared_ptr<ISocketAdapter>> GetConnections() const override;
+
+    ~ConnectionManager() override = default;
+
+    ConnectionManager(const ConnectionManager&) = delete;
+    ConnectionManager& operator=(const ConnectionManager&) = delete;
+
+    ConnectionManager(ConnectionManager&&) = delete;
+    ConnectionManager& operator=(ConnectionManager&&) = delete;
 
 private:
     tcp::resolver _resolver;
