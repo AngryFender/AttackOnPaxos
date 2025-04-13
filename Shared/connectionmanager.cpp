@@ -1,21 +1,16 @@
 #include "connectionmanager.h"
+#include "socketadapter.h"
 
-void ConnectionManager::AddConnection(std::shared_ptr<ISocketAdapter> socketAdapter)
+void ConnectionManager::AddConnection(const std::string& address)
 {
     std::unique_lock lock(_mutex);
-    _connections[socketAdapter->getSocket().remote_endpoint().address().to_string()] = socketAdapter;
+    const tcp::resolver::query query(address,_port,boost::asio::ip::resolver_base::numeric_service);
+    tcp::resolver::results_type endpoints = _resolver.resolve(query);
 
-    // tcp::resolver::query query(ipAddress,_port,boost::asio::ip::resolver_base::numeric_service);
-    // tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-    // tcp::resolver::iterator end;
-    //
-    // tcp::socket socket(io_context);
-    // boost::system::error_code error = boost::asio::error::host_not_found;
-    // while (error && endpoint_iterator != end)
+    std::shared_ptr<ISocketAdapter> socket = std::make_shared<SocketAdapter>(_io_context);
+    // socket->async_connect(endpoints,[self = shared_from_this()](const boost::system::error_code& code, const tcp::endpoint& endpoint)
     // {
-    //     socket.close();
-    //     socket.connect(*endpoint_iterator++, error);
-    // }
+    // });
 }
 
 void ConnectionManager::RemoveConnection(const std::string address)
