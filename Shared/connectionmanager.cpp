@@ -1,16 +1,24 @@
 #include "connectionmanager.h"
+#include "logger.h"
 #include "socketadapter.h"
 
 void ConnectionManager::AddConnection(const std::string& address)
 {
     std::unique_lock lock(_mutex);
-    const tcp::resolver::query query(address,_port,boost::asio::ip::resolver_base::numeric_service);
-    tcp::resolver::results_type endpoints = _resolver.resolve(query);
 
+    const tcp::endpoint endpoint(boost::asio::ip::address::from_string(address), _port);
     std::shared_ptr<ISocketAdapter> socket = std::make_shared<SocketAdapter>(_io_context);
-    // socket->async_connect(endpoints,[self = shared_from_this()](const boost::system::error_code& code, const tcp::endpoint& endpoint)
-    // {
-    // });
+    socket->async_connect(endpoint,[socket, address, self = shared_from_this()](const boost::system::error_code& code)
+    {
+        if(code)
+        {
+            Log(ERROR)<<"Unable to connect to "<< address.c_str() << code.to_string().c_str() << "\n";
+            return;
+        }
+        std::unique_lock lock(self->_mutex);
+        self->_connections[socket->getSocket().remote_endpoint().address().to_string()] = socket;
+        Log(INFO)<<"Connected to " << address.c_str()<<"\n";
+    });
 }
 
 void ConnectionManager::RemoveConnection(const std::string address)
