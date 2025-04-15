@@ -8,15 +8,15 @@ void ConnectionManager::AddConnection(const std::string& address)
 
     const tcp::endpoint endpoint(boost::asio::ip::address::from_string(address), _port);
     std::shared_ptr<ISocketAdapter> socket = std::make_shared<SocketAdapter>(_io_context);
-    socket->async_connect(endpoint,[socket, address, self = shared_from_this()](const boost::system::error_code& code)
+    socket->async_connect(endpoint,[socket, address,this](const boost::system::error_code& code)
     {
         if(code)
         {
             Log(ERROR)<<"Unable to connect to "<< address.c_str() << code.to_string().c_str() << "\n";
             return;
         }
-        std::unique_lock lock(self->_mutex);
-        self->_connections[socket->getSocket().remote_endpoint().address().to_string()] = socket;
+        std::unique_lock lock(this->_mutex);
+        this->_connections[socket->getSocket().remote_endpoint().address().to_string()] = socket;
         Log(INFO)<<"Connected to " << address.c_str()<<"\n";
     });
 }

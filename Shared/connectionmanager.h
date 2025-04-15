@@ -3,7 +3,7 @@
 #include <shared_mutex>
 #include "iconnectionmanager.h"
 
-class ConnectionManager: public IConnectionManager, public std::enable_shared_from_this<ConnectionManager>
+class ConnectionManager: public IConnectionManager
 {
 public:
     explicit ConnectionManager(boost::asio::io_context& io_context,const int port): _io_context(io_context), _resolver(io_context), _port(port)
