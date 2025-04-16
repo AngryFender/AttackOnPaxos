@@ -16,7 +16,7 @@ void ConnectionManager::AddConnection(const std::string& address)
             return;
         }
         std::unique_lock lock(this->_mutex);
-        this->_connections[socket->getSocket().remote_endpoint().address().to_string()] = socket;
+        this->_out_connections[socket->getSocket().remote_endpoint().address().to_string()] = socket;
         Log(INFO)<<"Connected to " << address.c_str()<<"\n";
     });
 }
@@ -24,14 +24,14 @@ void ConnectionManager::AddConnection(const std::string& address)
 void ConnectionManager::RemoveConnection(const std::string address)
 {
     std::unique_lock lock(_mutex);
-    _connections.erase(address);
+    _out_connections.erase(address);
 }
 
 bool ConnectionManager::GetConnection(const std::string address, std::shared_ptr<ISocketAdapter>& socketAdapter) const
 {
     std::shared_lock lock(_mutex);
-    const auto it = _connections.find(address);
-    if(it != _connections.end())
+    const auto it = _out_connections.find(address);
+    if(it != _out_connections.end())
     {
         socketAdapter = it->second;
         return true;
@@ -42,5 +42,5 @@ bool ConnectionManager::GetConnection(const std::string address, std::shared_ptr
 std::map<std::string, std::shared_ptr<ISocketAdapter>> ConnectionManager::GetConnections() const
 {
     std::shared_lock lock(_mutex);
-    return _connections;
+    return _out_connections;
 }
