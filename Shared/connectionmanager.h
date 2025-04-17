@@ -1,5 +1,6 @@
 #ifndef CONNECTIONMANAGER_H
 #define CONNECTIONMANAGER_H
+#include <iostream>
 #include <shared_mutex>
 
 #include "acceptoradapter.h"
@@ -9,8 +10,8 @@
 class ConnectionManager: public IConnectionManager
 {
 public:
-    explicit ConnectionManager(boost::asio::io_context& io_context, const int port): _io_context(io_context),
-        _resolver(io_context), _port(port), _acceptor(std::make_shared<AcceptorAdapter>(io_context, port))
+    explicit ConnectionManager(boost::asio::io_context& io_context, const int port, std::shared_ptr<IAcceptorAdapter> adapter): _io_context(io_context),
+        _resolver(io_context), _port(port), _acceptor(std::move(adapter))
     {
     };
 

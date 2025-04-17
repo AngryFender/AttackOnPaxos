@@ -33,8 +33,7 @@ void init_tcp_server()
     {
         Log(INFO) << "Starting Server" << "\n";
         boost::asio::io_context io_context;
-        AcceptorAdapter acceptor(io_context, PORTNO);
-        ConnectionManager connectionManager(io_context, PORTNO);
+        ConnectionManager connectionManager(io_context, PORTNO, std::make_shared<AcceptorAdapter>(io_context, PORTNO));
 
         io_context.run();
     }
