@@ -2,28 +2,30 @@
 #include "socketadapter.h"
 #include "../Shared/logger.h"
 
+void AcceptorAdapter::setHandler(std::function<void(std::shared_ptr<ISocketAdapter>)> handler)
+{
+    if (handler)
+    {
+        _accept_handler = handler;
+    }
+}
+
 void AcceptorAdapter::open()
 {
     //new socket
-    auto socketAdpt  = SocketAdapter::create(_io_context);
+    const auto socket_adpt  = SocketAdapter::create(_io_context);
+    std::shared_ptr<ISocketAdapter> socket_base = socket_adpt;
 
     //async_accept
-    _acceptor.async_accept(socketAdpt->getSocket(), std::bind(&AcceptorAdapter::handle_accept, this, socketAdpt, boost::asio::placeholders::error));
-}
-
-void AcceptorAdapter::handle_accept(const std::shared_ptr<SocketAdapter>& socketAdapter, const error_code& error)
-{
-    //error handling
-    if(!error)
+    _acceptor.async_accept(socket_adpt->getSocket(), [socket_base, this](const error_code& error)
     {
-        std::string address = socketAdapter->getSocket().remote_endpoint().address().to_string();
-        _connections[address] =  socketAdapter;
-        Log(DEBUG) << address.c_str() <<" has successfully connected\n";
-    }
-    open();
+        if (error)
+        {
+            Log(ERROR) << "Acceptor Error: " << error.message().c_str() << "\n";
+        }
+        _accept_handler(socket_base);
+
+        this->open();
+    });
 }
 
-const std::map<std::string, std::shared_ptr<ISocketAdapter>> AcceptorAdapter::getConnections() const
-{
-    return _connections;
-}
