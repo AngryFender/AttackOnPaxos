@@ -2,13 +2,9 @@
 #include "logger.h"
 #include "socketadapter.h"
 
-void ConnectionManager::AddConnection(const std::string& address)
+void ConnectionManager::AddConnection(const std::string& address, const tcp::endpoint& endpoint, std::shared_ptr<ISocketAdapter>& socket)
 {
-    std::unique_lock lock(_mutex);
-
-    const tcp::endpoint endpoint(boost::asio::ip::address::from_string(address), _port);
-    std::shared_ptr<ISocketAdapter> socket = std::make_shared<SocketAdapter>(_io_context);
-    socket->async_connect(endpoint,[socket, address,this](const boost::system::error_code& code)
+    socket->async_connect(endpoint,[socket, address,this](const error_code& code)
     {
         if(code)
         {
@@ -43,4 +39,9 @@ std::map<std::string, std::shared_ptr<ISocketAdapter>> ConnectionManager::GetCon
 {
     std::shared_lock lock(_mutex);
     return _out_connections;
+}
+
+void ConnectionManager::AcceptHandler(const std::shared_ptr<ISocketAdapter>& socket)
+{
+// add to map
 }
