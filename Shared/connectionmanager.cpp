@@ -43,10 +43,9 @@ std::map<std::string, std::shared_ptr<ISocketAdapter>> ConnectionManager::GetCon
 
 void ConnectionManager::AcceptHandler(const std::shared_ptr<ISocketAdapter>& socket)
 {
-// add to map
-    std::string address = socket->getSocket().remote_endpoint().address().to_string() ;
-    if (out_connections.find(address)== out_connections.end())
+    const std::string address = socket->getSocket().remote_endpoint().address().to_string() ;
+    if (!_out_connections.contains(address))
     {
-        out_connections[address] = socket;
+        _out_connections[address] = socket;
     } 
 }

@@ -13,6 +13,10 @@ public:
     explicit ConnectionManager(boost::asio::io_context& io_context, const int port, std::shared_ptr<IAcceptorAdapter> adapter): _io_context(io_context),
         _resolver(io_context), _port(port), _acceptor(std::move(adapter))
     {
+        _acceptor->setHandler([this](const std::shared_ptr<ISocketAdapter>& socket)
+        {
+            this->AcceptHandler(socket);
+        });
     };
 
     void AddConnection(const std::string& address, const tcp::endpoint& endpoint, std::shared_ptr<ISocketAdapter>& socket) override;
