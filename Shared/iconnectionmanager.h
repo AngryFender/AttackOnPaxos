@@ -12,6 +12,7 @@ public:
     virtual void AddConnection(const std::string& address, const tcp::endpoint& endpoint, std::shared_ptr<ISocketAdapter>& socket) = 0;
     virtual void RemoveConnection(const std::string address) = 0;
     virtual bool GetConnection(const std::string address, std::shared_ptr<ISocketAdapter>& socketAdapter) const = 0;
+    virtual void AcceptConnection(const std::shared_ptr<ISocketAdapter>& socket) = 0;
     virtual std::map<std::string, std::shared_ptr<ISocketAdapter>> GetConnections() const = 0;
 };
 
