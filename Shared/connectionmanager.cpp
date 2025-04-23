@@ -1,6 +1,5 @@
 #include "connectionmanager.h"
 #include "logger.h"
-#include "socketadapter.h"
 
 void ConnectionManager::AddConnection(const std::string& address, const tcp::endpoint& endpoint, std::shared_ptr<ISocketAdapter>& socket)
 {
