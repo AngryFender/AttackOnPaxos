@@ -4,7 +4,6 @@ project(Node)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(Node main.cpp
-        ../Shared/iConnection.h
         ../Shared/ilogger.h
         ../Shared/logger.cpp
         ../Shared/logger.h

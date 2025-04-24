@@ -1,6 +1,5 @@
 #include <iostream>
 #include "../Shared/plainconnection.h"
-#include "../Shared/asioconnection.h"
 #include "../Shared/connectionmanager.h"
 
 #define PORTNO 3491

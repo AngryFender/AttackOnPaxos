@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include "../Shared/asioconnection.h"
 #include "../Shared/ilogger.h"
 #include "../Shared/logger.h"
 #include "../Shared/acceptoradapter.h"
