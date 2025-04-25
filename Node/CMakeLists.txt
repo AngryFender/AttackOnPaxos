@@ -16,6 +16,8 @@ add_executable(Node main.cpp
         ../Shared/iconnectionmanager.h
         ../Shared/connectionmanager.h
         ../Shared/connectionmanager.cpp
+        ../Shared/concord.cpp
+        ../Shared/concord.h
 )
 
 find_package(Boost 1.74.0 REQUIRED)
