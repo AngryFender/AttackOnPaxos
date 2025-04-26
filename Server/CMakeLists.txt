@@ -18,6 +18,7 @@ add_executable(AttackOnPaxos main.cpp
         ../Shared/connectionmanager.cpp
         ../Shared/concord.cpp
         ../Shared/concord.h
+        ../Shared/istrategy.h
 )
 
 find_package(Boost 1.74.0 REQUIRED)
