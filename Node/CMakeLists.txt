@@ -19,6 +19,8 @@ add_executable(Node main.cpp
         ../Shared/concord.cpp
         ../Shared/concord.h
         ../Shared/istrategy.h
+        ../Shared/paxos.cpp
+        ../Shared/paxos.h
 )
 
 find_package(Boost 1.74.0 REQUIRED)
