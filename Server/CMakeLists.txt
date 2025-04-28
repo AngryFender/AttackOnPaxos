@@ -21,6 +21,7 @@ add_executable(AttackOnPaxos main.cpp
         ../Shared/istrategy.h
         ../Shared/paxos.cpp
         ../Shared/paxos.h
+        ../Shared/packet.h
 )
 
 find_package(Boost 1.74.0 REQUIRED)
