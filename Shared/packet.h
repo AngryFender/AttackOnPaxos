@@ -2,19 +2,19 @@
 #define PACKET_H
 #include <cstdint>
 
-enum state
+enum class  state
 {
-    Proposal = 0,
+    Prepare = 0,
     Promise,
     Accept,
     Response
 };
 
-struct Proposal
+struct Prepare
 {
     uint32_t id;
-    uint32_t length;
     uint8_t type;
+    uint32_t length;
 };
 
 struct Promise
