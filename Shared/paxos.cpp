@@ -21,7 +21,21 @@ void Paxos::SendPrepareID(const uint64_t id)
     }
 }
 
-void Paxos::SendAcceptRequest(const uint64_t id)
+void Paxos::SendAcceptRequest(const uint64_t id, const uint64_t value)
 {
     //send accept request id to all acceptor nodes
+    Accept a{};
+    a.id = htonl(id);
+    a.type = static_cast<int>(state::Prepare);
+    a.value = value;
+    a.length = htonl(sizeof(a.id) + sizeof (a.type));
+
+    for(const auto& connection_pair: _manager.GetConnections())
+    {
+        const auto& socket = connection_pair.second;
+        socket->async_write(boost::asio::const_buffer(&a,sizeof(a)), [](const boost::system::error_code& code, std::size_t size)
+        {
+            Log(INFO)<<"Write Complete " << std::to_string(size).c_str() <<"\n";
+        });
+    }
 }

@@ -13,7 +13,7 @@ public:
      ~Paxos() override = default;
 
      void SendPrepareID(const uint64_t id) override;
-     void SendAcceptRequest(const uint64_t id) override;
+     void SendAcceptRequest(uint64_t id, uint64_t value) override;
 private:
      IConnectionManager& _manager;
 };

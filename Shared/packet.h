@@ -12,14 +12,14 @@ enum class  state
 
 struct Prepare
 {
-    uint32_t id;
+    uint64_t id;
     uint8_t type;
     uint32_t length;
 };
 
 struct Promise
 {
-    uint32_t id;
+    uint64_t id;
     uint32_t length;
     uint8_t type;
     uint8_t accept;
@@ -27,7 +27,7 @@ struct Promise
 
 struct Accept
 {
-    uint32_t id;
+    uint64_t id;
     uint32_t length;
     uint8_t type;
     uint64_t value;
@@ -35,7 +35,7 @@ struct Accept
 
 struct Response
 {
-    uint32_t id;
+    uint64_t id;
     uint32_t length;
     uint8_t type;
     uint8_t accept;
