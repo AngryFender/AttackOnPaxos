@@ -3,7 +3,7 @@
 #include "logger.h"
 #include "packet.h"
 
-void Paxos::SendPrepareID(const uint64_t id)
+void Paxos::SendPrepare(const uint64_t id)
 {
     //send prepare id to all acceptor nodes
     Prepare p{};
@@ -21,13 +21,17 @@ void Paxos::SendPrepareID(const uint64_t id)
     }
 }
 
-void Paxos::SendAcceptRequest(const uint64_t id, const uint64_t value)
+void Paxos::SendPromise(const uint64_t id, std::shared_ptr<ISocketAdapter> socket)
+{
+}
+
+void Paxos::SendAccept(const uint64_t id, const uint64_t value)
 {
     //send accept request id to all acceptor nodes
     Accept a{};
     a.id = htonl(id);
     a.type = static_cast<int>(state::Prepare);
-    a.value = value;
+    a.value = htonl(value);
     a.length = htonl(sizeof(a.id) + sizeof (a.type));
 
     for(const auto& connection_pair: _manager.GetConnections())
@@ -38,4 +42,8 @@ void Paxos::SendAcceptRequest(const uint64_t id, const uint64_t value)
             Log(INFO)<<"Write Complete " << std::to_string(size).c_str() <<"\n";
         });
     }
+}
+
+void Paxos::SendResponse(uint64_t id, std::shared_ptr<ISocketAdapter> socket)
+{
 }

@@ -2,7 +2,7 @@
 #define PACKET_H
 #include <cstdint>
 
-enum class  state
+enum class state:int8_t
 {
     Prepare = 0,
     Promise,

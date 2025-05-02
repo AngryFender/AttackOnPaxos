@@ -3,7 +3,6 @@
 #include "istrategy.h"
 #include "iconnectionmanager.h"
 
-
 class Paxos : public IStrategy
 {
 public:
@@ -12,8 +11,10 @@ public:
      }
      ~Paxos() override = default;
 
-     void SendPrepareID(const uint64_t id) override;
-     void SendAcceptRequest(uint64_t id, uint64_t value) override;
+     void SendPrepare(const uint64_t id) override;
+     void SendPromise(const uint64_t id, std::shared_ptr<ISocketAdapter> socket) override;
+     void SendAccept(uint64_t id, uint64_t value) override;
+     void SendResponse(uint64_t id, std::shared_ptr<ISocketAdapter> socket) override;
 private:
      IConnectionManager& _manager;
 };
