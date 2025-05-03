@@ -12,7 +12,7 @@ public:
      ~Paxos() override = default;
 
      void SendPrepare(const uint64_t id) override;
-     void SendPromise(const uint64_t id, std::shared_ptr<ISocketAdapter> socket) override;
+     void SendPromise(const uint64_t id, const bool accept, std::shared_ptr<ISocketAdapter> socket) override;
      void SendAccept(uint64_t id, uint64_t value) override;
      void SendResponse(uint64_t id, std::shared_ptr<ISocketAdapter> socket) override;
 private:
