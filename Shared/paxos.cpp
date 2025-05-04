@@ -41,7 +41,7 @@ void Paxos::SendAccept(const uint64_t id, const uint64_t value)
     a.id = htonl(id);
     a.type = static_cast<uint8_t>(state::Prepare);
     a.value = htonl(value);
-    a.length = htonl(sizeof(a.id) + sizeof (a.type));
+    a.length = htonl(sizeof(a.id) + sizeof(a.type) + sizeof(a.value));
 
     for(const auto& connection_pair: _manager.GetConnections())
     {
@@ -53,6 +53,17 @@ void Paxos::SendAccept(const uint64_t id, const uint64_t value)
     }
 }
 
-void Paxos::SendResponse(uint64_t id, std::shared_ptr<ISocketAdapter> socket)
+void Paxos::SendResponse(uint64_t id, const uint64_t value, const bool accept, std::shared_ptr<ISocketAdapter> socket)
 {
+    Response r{};
+    r.id = htonl(id);
+    r.type = static_cast<uint8_t>(state::Response);
+    r.accept = static_cast<uint8_t>(accept);
+    r.value = htonl(value);
+    r.length = htonl(sizeof(r.id) + sizeof(r.type) + sizeof(r.accept) + sizeof(value));
+
+    socket->async_write(boost::asio::buffer(&r, sizeof(r)), [](const boost::system::error_code& code, std::size_t size)
+    {
+        Log(INFO)<<"Write Complete" << std::to_string(size).c_str() <<"\n";
+    });
 }
