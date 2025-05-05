@@ -10,7 +10,7 @@ public:
     virtual ~ISocketAdapter() = default;
     virtual tcp::socket& getSocket() = 0;
 
-    virtual void async_read_some( const boost::asio::mutable_buffer& buffer , std::function<void(const boost::system::error_code&, std::size_t)> callback) = 0;
+    virtual void async_read_some(std::function<void(const boost::system::error_code&, std::vector<char>&)> callback) = 0;
     virtual void async_write(const boost::asio::const_buffer& message, std::function<void(const boost::system::error_code&, std::size_t)> callback) = 0;
     virtual void async_connect(const tcp::endpoint& peer_endpoint, std::function<void(const boost::system::error_code&)> callback) = 0;
     virtual void close() = 0;

@@ -6,10 +6,13 @@ tcp::socket& SocketAdapter::getSocket()
     return _socket;
 }
 
-void SocketAdapter::async_read_some(const boost::asio::mutable_buffer& buffer,
-                                    std::function<void(const boost::system::error_code&, std::size_t)> callback)
+void SocketAdapter::async_read_some(
+    std::function<void(const boost::system::error_code&, std::vector<char>& rawData)> callback)
 {
-    _socket.async_read_some(buffer, callback);
+    _socket.async_read_some(boost::asio::buffer(_data),[&](const boost::system::error_code& err, std::size_t)
+    {
+        callback(err, this->_data);
+    });
 }
 
 void SocketAdapter::async_write(const boost::asio::const_buffer& message,
