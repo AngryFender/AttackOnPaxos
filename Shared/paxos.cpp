@@ -3,9 +3,14 @@
 #include "logger.h"
 #include "packet.h"
 
+
+void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<char>& data)
+{
+
+}
+
 void Paxos::SendPrepare(const uint64_t id)
 {
-    //send prepare id to all acceptor nodes
     Prepare p{};
     p.id = htonl(id);
     p.type = static_cast<uint8_t>(state::Prepare);
@@ -36,7 +41,6 @@ void Paxos::SendPromise(const uint64_t id, const bool accept, std::shared_ptr<IS
 
 void Paxos::SendAccept(const uint64_t id, const uint64_t value)
 {
-    //send accept request id to all acceptor nodes
     Accept a{};
     a.id = htonl(id);
     a.type = static_cast<uint8_t>(state::Prepare);
