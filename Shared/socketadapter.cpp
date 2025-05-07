@@ -9,9 +9,10 @@ tcp::socket& SocketAdapter::getSocket()
 void SocketAdapter::async_read_some(
     std::function<void(const boost::system::error_code&, std::vector<char>& rawData)> callback)
 {
-    _socket.async_read_some(boost::asio::buffer(_data),[&](const boost::system::error_code& err, std::size_t)
+    auto self = get();
+    _socket.async_read_some(boost::asio::buffer(_data),[callback, self](const boost::system::error_code& err, std::size_t)
     {
-        callback(err, this->_data);
+        callback(err, self->_data);
     });
 }
 
