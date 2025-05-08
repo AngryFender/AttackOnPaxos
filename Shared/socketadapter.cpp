@@ -1,6 +1,8 @@
 
 #include "socketadapter.h"
 
+#include "logger.h"
+
 tcp::socket& SocketAdapter::getSocket()
 {
     return _socket;
@@ -12,6 +14,17 @@ void SocketAdapter::async_read_some(
     auto self = get();
     _socket.async_read_some(boost::asio::buffer(_data),[callback, self](const boost::system::error_code& err, std::size_t)
     {
+        if (err) {
+            Log(ERROR) << "Reading from socket failed:" << err.message().c_str() << "\n";
+            return;
+        }
+
+        //implement framing layer
+        //add to persistent buffer
+        //try to parse the message
+
+
+        //callback the message handler
         callback(err, self->_data);
     });
 }
