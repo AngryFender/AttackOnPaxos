@@ -54,3 +54,8 @@ void SocketAdapter::close()
 {
     _socket.close();
 }
+
+void SocketAdapter::parse_message()
+{
+
+}

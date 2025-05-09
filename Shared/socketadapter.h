@@ -10,6 +10,7 @@ public:
     {}
     ~SocketAdapter() override = default;
     tcp::socket& getSocket() override;
+
     void async_read_some(std::function<void(const boost::system::error_code&, std::vector<char>& rawData)> callback) override;
     void async_write(const boost::asio::const_buffer& message, std::function<void(const boost::system::error_code&, std::size_t)> callback) override;
     static std::shared_ptr<SocketAdapter> create(boost::asio::io_context& io_context);
@@ -19,6 +20,8 @@ public:
 private:
     tcp::socket _socket;
     std::vector<char> _data;
+    std::vector<char> _temp_data;
+    void parse_message();
 };
 
 
