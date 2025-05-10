@@ -6,7 +6,7 @@
 class SocketAdapter:public ISocketAdapter, std::enable_shared_from_this<SocketAdapter> {
 
 public:
-    explicit SocketAdapter(boost::asio::io_context& io_context): _socket(io_context), _data(1024)
+    explicit SocketAdapter(boost::asio::io_context& io_context): _socket(io_context), _data(1024), _temp_data(1024)
     {}
     ~SocketAdapter() override = default;
     tcp::socket& getSocket() override;
@@ -21,7 +21,7 @@ private:
     tcp::socket _socket;
     std::vector<char> _data;
     std::vector<char> _temp_data;
-    void parse_message();
+    bool parse_message(std::vector<char>& data);
 };
 
 

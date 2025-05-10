@@ -12,7 +12,7 @@ void SocketAdapter::async_read_some(
     std::function<void(const boost::system::error_code&, std::vector<char>& rawData)> callback)
 {
     auto self = get();
-    _socket.async_read_some(boost::asio::buffer(_data),[callback, self](const boost::system::error_code& err, std::size_t)
+    _socket.async_read_some(boost::asio::buffer(_temp_data),[callback, self](const boost::system::error_code& err, std::size_t)
     {
         if (err) {
             Log(ERROR) << "Reading from socket failed:" << err.message().c_str() << "\n";
@@ -21,11 +21,16 @@ void SocketAdapter::async_read_some(
 
         //implement framing layer
         //add to persistent buffer
+        for(const char& item: self->_temp_data)
+        {
+            self->_data.push_back(item);
+        }
         //try to parse the message
-
-
-        //callback the message handler
-        callback(err, self->_data);
+        if (self->parse_message(self->_data))
+        {
+            //callback the message handler
+            callback(err, self->_data);
+        }
     });
 }
 
@@ -55,7 +60,7 @@ void SocketAdapter::close()
     _socket.close();
 }
 
-void SocketAdapter::parse_message()
+bool SocketAdapter::parse_message(std::vector<char>& data)
 {
-
+    return false;
 }
