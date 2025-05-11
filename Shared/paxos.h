@@ -11,10 +11,11 @@ public:
          for (const auto& connection_pair : _manager.GetConnections())
          {
              const auto& socket = connection_pair.second;
-             socket->async_read_some([this](const boost::system::error_code& code, std::vector<char>& data)
+             socket->set_receive_callback([this](const boost::system::error_code& code, std::vector<char>& data)
              {
                  this->ReceivePacket(code, data);
              });
+             socket->start_async_receive();
          }
      }
 
