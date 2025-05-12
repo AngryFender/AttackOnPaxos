@@ -1,7 +1,7 @@
 #ifndef SOCKETADAPTER_H
 #define SOCKETADAPTER_H
+#include <boost/circular_buffer.hpp>
 #include "isocketadapter.h"
-
 
 class SocketAdapter:public ISocketAdapter, std::enable_shared_from_this<SocketAdapter> {
 
@@ -20,7 +20,7 @@ public:
     void close() override;
 private:
     tcp::socket _socket;
-    std::vector<char> _data;
+    boost::circular_buffer<char> _data;
     std::vector<char> _temp_data;
     std::function<void(const boost::system::error_code&, std::vector<char>& rawData)> _receive_callback;
     bool parse_message(std::vector<char>& data);
