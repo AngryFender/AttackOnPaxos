@@ -6,7 +6,7 @@
 class SocketAdapter:public ISocketAdapter, std::enable_shared_from_this<SocketAdapter> {
 
 public:
-    explicit SocketAdapter(boost::asio::io_context& io_context): _socket(io_context), _data(1024), _temp_data(1024)
+    explicit SocketAdapter(boost::asio::io_context& io_context): _socket(io_context), _internal_buff(1024), _packet_data(1024), _temp_data(1024)
     {}
     ~SocketAdapter() override = default;
     tcp::socket& getSocket() override;
@@ -20,10 +20,11 @@ public:
     void close() override;
 private:
     tcp::socket _socket;
-    boost::circular_buffer<char> _data;
+    boost::circular_buffer<char> _internal_buff;
+    std::vector<char> _packet_data;
     std::vector<char> _temp_data;
     std::function<void(const boost::system::error_code&, std::vector<char>& rawData)> _receive_callback;
-    bool parse_message(std::vector<char>& data);
+    bool parse_message(boost::circular_buffer<char>& buffer);
 };
 
 

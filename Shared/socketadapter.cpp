@@ -1,6 +1,4 @@
-
 #include "socketadapter.h"
-
 #include "logger.h"
 
 tcp::socket& SocketAdapter::getSocket()
@@ -53,21 +51,21 @@ void SocketAdapter::start_async_receive()
         //add to persistent buffer
         for(const char& item: self->_temp_data)
         {
-            self->_data.push_back(item);
+            self->_internal_buff.push_back(item);
         }
+
         //try to parse the message
-        if (self->parse_message(self->_data))
+        if (self->parse_message(self->_internal_buff))
         {
             //callback the message handler
-            self->_receive_callback(err, self->_data);
+            self->_receive_callback(err, self->_packet_data);
         }
 
         //rehook
         self->start_async_receive();
     });
 }
-
-bool SocketAdapter::parse_message(std::vector<char>& data)
+bool SocketAdapter::parse_message(boost::circular_buffer<char>& buffer)
 {
     return false;
 }
