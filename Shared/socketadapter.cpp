@@ -6,7 +6,7 @@ tcp::socket& SocketAdapter::getSocket()
     return _socket;
 }
 
-void SocketAdapter::set_receive_callback(std::function<void(const boost::system::error_code&, std::vector<char>& rawData)> callback)
+void SocketAdapter::set_receive_callback(std::function<void(const boost::system::error_code&, std::vector<uint8_t>& rawData)> callback)
 {
     _receive_callback = std::move(callback);
 }
@@ -49,7 +49,7 @@ void SocketAdapter::start_async_receive()
 
         //implement framing layer
         //add to persistent buffer
-        for(const char& item: self->_temp_data)
+        for(const uint8_t& item: self->_temp_data)
         {
             self->_internal_buff.push_back(item);
         }

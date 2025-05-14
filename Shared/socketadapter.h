@@ -11,7 +11,7 @@ public:
     ~SocketAdapter() override = default;
     tcp::socket& getSocket() override;
 
-    void set_receive_callback(std::function<void(const boost::system::error_code&, std::vector<char>& rawData)> callback) override;
+    void set_receive_callback(std::function<void(const boost::system::error_code&, std::vector<uint8_t>& rawData)> callback) override;
     void start_async_receive() override;
     void async_write(const boost::asio::const_buffer& message, std::function<void(const boost::system::error_code&, std::size_t)> callback) override;
     static std::shared_ptr<SocketAdapter> create(boost::asio::io_context& io_context);
@@ -20,11 +20,11 @@ public:
     void close() override;
 private:
     tcp::socket _socket;
-    boost::circular_buffer<char> _internal_buff;
-    std::vector<char> _packet_data;
-    std::vector<char> _temp_data;
-    std::function<void(const boost::system::error_code&, std::vector<char>& rawData)> _receive_callback;
-    bool parse_message(boost::circular_buffer<char>& buffer);
+    boost::circular_buffer<uint8_t> _internal_buff;
+    std::vector<uint8_t> _packet_data;
+    std::vector<uint8_t> _temp_data;
+    std::function<void(const boost::system::error_code&, std::vector<uint8_t>& rawData)> _receive_callback;
+    bool parse_message(boost::circular_buffer<uint8_t>& buffer);
 };
 
 

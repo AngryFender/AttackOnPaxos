@@ -11,7 +11,7 @@ public:
          for (const auto& connection_pair : _manager.GetConnections())
          {
              const auto& socket = connection_pair.second;
-             socket->set_receive_callback([this](const boost::system::error_code& code, std::vector<char>& data)
+             socket->set_receive_callback([this](const boost::system::error_code& code, std::vector<uint8_t>& data)
              {
                  this->ReceivePacket(code, data);
              });
@@ -21,7 +21,7 @@ public:
 
      ~Paxos() override = default;
 
-     void ReceivePacket(const boost::system::error_code& error, std::vector<char>& data) override;
+     void ReceivePacket(const boost::system::error_code& error, std::vector<uint8_t>& data) override;
      void SendPrepare(const uint64_t id) override;
      void SendPromise(const uint64_t id, const bool accept, std::shared_ptr<ISocketAdapter> socket) override;
      void SendAccept(uint64_t id, uint64_t value) override;

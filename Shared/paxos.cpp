@@ -4,7 +4,7 @@
 #include "packet.h"
 
 
-void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<char>& data)
+void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<uint8_t>& data)
 {
 
 }
