@@ -22,6 +22,7 @@ add_executable(Node main.cpp
         ../Shared/paxos.cpp
         ../Shared/paxos.h
         ../Shared/packet.h
+        ../Shared/utility.h
 )
 
 find_package(Boost 1.74.0 REQUIRED)

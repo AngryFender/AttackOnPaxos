@@ -1,5 +1,6 @@
 #include "socketadapter.h"
 #include "logger.h"
+#include "utility.h"
 
 tcp::socket& SocketAdapter::getSocket()
 {
@@ -55,7 +56,7 @@ void SocketAdapter::start_async_receive()
         }
 
         //try to parse the message
-        if (self->parse_message(self->_internal_buff))
+        if (utility::parse_message(self->_internal_buff, self->_packet_data))
         {
             //callback the message handler
             self->_receive_callback(err, self->_packet_data);
@@ -64,8 +65,4 @@ void SocketAdapter::start_async_receive()
         //rehook
         self->start_async_receive();
     });
-}
-bool SocketAdapter::parse_message(boost::circular_buffer<char>& buffer)
-{
-    return false;
 }

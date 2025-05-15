@@ -24,7 +24,6 @@ private:
     std::vector<uint8_t> _packet_data;
     std::vector<uint8_t> _temp_data;
     std::function<void(const boost::system::error_code&, std::vector<uint8_t>& rawData)> _receive_callback;
-    bool parse_message(boost::circular_buffer<uint8_t>& buffer);
 };
 
 
