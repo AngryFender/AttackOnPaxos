@@ -12,6 +12,8 @@ public:
 
     virtual void set_receive_callback(std::function<void(const boost::system::error_code&, std::vector<uint8_t>&)> callback) = 0;
     virtual void start_async_receive() = 0;
+    virtual void set_send_callback(std::function<void(const boost::system::error_code&)> callback) = 0;
+    virtual void start_async_send() = 0;
     virtual void async_write(const boost::asio::const_buffer& message, std::function<void(const boost::system::error_code&, std::size_t)> callback) = 0;
     virtual void async_connect(const tcp::endpoint& peer_endpoint, std::function<void(const boost::system::error_code&)> callback) = 0;
     virtual void close() = 0;
