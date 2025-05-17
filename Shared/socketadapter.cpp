@@ -1,7 +1,7 @@
 #include "socketadapter.h"
 #include "logger.h"
 #include "utility.h"
-
+#include "boost/asio/write.hpp"
 tcp::socket& SocketAdapter::getSocket()
 {
     return _socket;
@@ -12,10 +12,8 @@ void SocketAdapter::set_receive_callback(std::function<void(const boost::system:
     _receive_callback = std::move(callback);
 }
 
-void SocketAdapter::async_write(const boost::asio::const_buffer& message,
-    std::function<void(const boost::system::error_code&, std::size_t)> callback)
+void SocketAdapter::set_send_callback(std::function<void(const boost::system::error_code&)> callback)
 {
-    _socket.async_write_some(message, callback);
 }
 
 std::shared_ptr<SocketAdapter> SocketAdapter::create(boost::asio::io_context& io_context)
@@ -66,3 +64,32 @@ void SocketAdapter::start_async_receive()
         self->start_async_receive();
     });
 }
+
+void SocketAdapter::async_send(const boost::asio::const_buffer& message)
+{
+    _outbounds.emplace(message);
+
+    if (!_write_in_progress)
+    {
+        _write_in_progress = true;
+        start_async_send();
+    }
+}
+
+void SocketAdapter::start_async_send()
+{
+    auto self = get();
+    async_write(_socket,_outbounds.front(),[self](const boost::system::error_code& error, size_t size)
+    {
+        self->_outbounds.pop();
+        if(self->_outbounds.empty() || error)
+        {
+            self->_write_in_progress = false;
+            self->_send_callback(error);
+            return;
+        }
+        self->start_async_send();
+    });
+}
+
+
