@@ -13,11 +13,10 @@ void AcceptorAdapter::setHandler(std::function<void(std::shared_ptr<ISocketAdapt
 void AcceptorAdapter::open()
 {
     //new socket
-    const auto socket_adpt  = SocketAdapter::create(_io_context);
-    std::shared_ptr<ISocketAdapter> socket_base = socket_adpt;
+    std::shared_ptr<ISocketAdapter> socket_base = std::make_shared<SocketAdapter>(_io_context);
 
     //async_accept
-    _acceptor.async_accept(socket_adpt->getSocket(), [socket_base, this](const error_code& error)
+    _acceptor.async_accept(socket_base->getSocket(), [socket_base, this](const error_code& error)
     {
         if (error)
         {

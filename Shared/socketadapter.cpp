@@ -9,21 +9,12 @@ tcp::socket& SocketAdapter::getSocket()
 
 void SocketAdapter::set_receive_callback(std::function<void(const boost::system::error_code&, std::vector<uint8_t>& rawData)> callback)
 {
-    _receive_callback = std::move(callback);
+    _receive_callback = callback;
 }
 
 void SocketAdapter::set_send_callback(std::function<void(const boost::system::error_code&)> callback)
 {
-}
-
-std::shared_ptr<SocketAdapter> SocketAdapter::create(boost::asio::io_context& io_context)
-{
-    return std::make_shared<SocketAdapter>(io_context);
-}
-
-std::shared_ptr<SocketAdapter> SocketAdapter::get()
-{
-    return shared_from_this();
+    _send_callback = callback;
 }
 
 void SocketAdapter::async_connect(const tcp::endpoint& peer_endpoint,const std::function<void(const boost::system::error_code&)> callback)
@@ -38,13 +29,14 @@ void SocketAdapter::close()
 
 void SocketAdapter::start_async_receive()
 {
-    auto self = get();
-    _socket.async_read_some(boost::asio::buffer(_temp_data),[self](const boost::system::error_code& err, std::size_t)
+    auto self = shared_from_this();
+    _socket.async_read_some(boost::asio::buffer(_temp_data),[self](const boost::system::error_code& err, std::size_t size)
     {
         if (err) {
             Log(ERROR) << "Reading from socket failed:" << err.message().c_str() << "\n";
             return;
         }
+        self->_temp_data.resize(size);
 
         //implement framing layer
         //add to persistent buffer
@@ -78,11 +70,11 @@ void SocketAdapter::async_send(const boost::asio::const_buffer& message)
 
 void SocketAdapter::start_async_send()
 {
-    auto self = get();
-    async_write(_socket,_outbounds.front(),[self](const boost::system::error_code& error, size_t size)
+    auto self = shared_from_this();
+    async_write(_socket, _outbounds.front(), [self](const boost::system::error_code& error, size_t size)
     {
         self->_outbounds.pop();
-        if(self->_outbounds.empty() || error)
+        if (self->_outbounds.empty() || error)
         {
             self->_write_in_progress = false;
             self->_send_callback(error);
@@ -91,5 +83,3 @@ void SocketAdapter::start_async_send()
         self->start_async_send();
     });
 }
-
-
