@@ -3,10 +3,33 @@
 #include "logger.h"
 #include "packet.h"
 
+void Paxos::SetSocketHandlers(const std::shared_ptr<ISocketAdapter>& socket)
+{
+    socket->set_receive_callback([this](const boost::system::error_code& code, std::vector<uint8_t>& data)
+    {
+        this->ReceivePacket(code, data);
+    });
+    socket->start_async_receive();
+
+    socket->set_send_callback([](const boost::system::error_code& code)
+    {
+        if (code)
+        {
+            Log(ERROR) << "Sending paxos packet error" << code.message().c_str() << "\n";
+            return;
+        }
+        Log(INFO) << "Paxos sent\n";
+    });
+}
 
 void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<uint8_t>& data)
 {
-
+    uint64_t id = 0;
+    for(int i = 4; i < 12; ++i)
+    {
+        id = static_cast<uint64_t>(data[i]<<((i-4)*8)) | id;
+    }
+    Log(INFO) << "receiving "<<std::to_string(ntohl(id)).c_str() << "\n";
 }
 
 void Paxos::SendPrepare(const uint64_t id)
@@ -16,13 +39,10 @@ void Paxos::SendPrepare(const uint64_t id)
     p.type = static_cast<uint8_t>(state::Prepare);
     p.length = htonl(sizeof(p.id) + sizeof (p.type));
 
-    for(const auto& connection_pair: _manager.GetConnections())
+    for(auto& connection_pair: _manager.GetConnections())
     {
-        const auto& socket = connection_pair.second;
-        // socket->async_write(boost::asio::const_buffer(&p,sizeof(p)), [](const boost::system::error_code& code, std::size_t size)
-        // {
-        //     Log(INFO)<<"Write Complete " << std::to_string(size).c_str() <<"\n";
-        // });
+        auto socket = connection_pair.second;
+        socket->async_send(boost::asio::const_buffer(&p, sizeof(p)));
     }
 }
 
@@ -33,10 +53,8 @@ void Paxos::SendPromise(const uint64_t id, const bool accept, std::shared_ptr<IS
     p.type = static_cast<uint8_t>(state::Promise);
     p.accept = static_cast<uint8_t>(accept);
     p.length = htonl(sizeof(p.id) + sizeof (p.type));
-    // socket->async_write(boost::asio::const_buffer(&p, sizeof(p)),[](const boost::system::error_code& code, std::size_t size)
-    // {
-    //     Log(INFO) << "Write Complete " << std::to_string(size).c_str() << "\n";
-    // });
+
+    socket->async_send(boost::asio::const_buffer(&p, sizeof(p)));
 }
 
 void Paxos::SendAccept(const uint64_t id, const uint64_t value)
@@ -50,10 +68,7 @@ void Paxos::SendAccept(const uint64_t id, const uint64_t value)
     for(const auto& connection_pair: _manager.GetConnections())
     {
         const auto& socket = connection_pair.second;
-        // socket->async_write(boost::asio::const_buffer(&a,sizeof(a)), [](const boost::system::error_code& code, std::size_t size)
-        // {
-        //     Log(INFO)<<"Write Complete " << std::to_string(size).c_str() <<"\n";
-        // });
+        socket->async_send(boost::asio::const_buffer(&a,sizeof(a)));
     }
 }
 
@@ -66,8 +81,5 @@ void Paxos::SendResponse(uint64_t id, const uint64_t value, const bool accept, s
     r.value = htonl(value);
     r.length = htonl(sizeof(r.id) + sizeof(r.type) + sizeof(r.accept) + sizeof(value));
 
-    // socket->async_write(boost::asio::buffer(&r, sizeof(r)), [](const boost::system::error_code& code, std::size_t size)
-    // {
-    //     Log(INFO)<<"Write Complete" << std::to_string(size).c_str() <<"\n";
-    // });
+    socket->async_send(boost::asio::buffer(&r, sizeof(r)));
 }
