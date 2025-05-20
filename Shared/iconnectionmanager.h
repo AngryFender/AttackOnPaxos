@@ -14,6 +14,7 @@ public:
     virtual bool GetConnection(const std::string address, std::shared_ptr<ISocketAdapter>& socketAdapter) const = 0;
     virtual void AcceptConnection(const std::shared_ptr<ISocketAdapter>& socket) = 0;
     virtual std::map<std::string, std::shared_ptr<ISocketAdapter>> GetConnections() const = 0;
+    virtual void SetSocketHandlers(std::function<void(const std::shared_ptr<ISocketAdapter>&)> callback) = 0;
 };
 
 #endif //ICONNECTIONMANAGER_H

@@ -13,6 +13,11 @@ void ConnectionManager::AddConnection(const std::string& address, const tcp::end
         std::unique_lock lock(this->_mutex);
         this->_out_connections[socket->getSocket().remote_endpoint().address().to_string()] = socket;
         Log(INFO)<<"Connected to " << address.c_str()<<"\n";
+
+        if (_set_socket_handlers)
+        {
+            _set_socket_handlers(socket);
+        }
     });
 }
 
@@ -47,5 +52,15 @@ void ConnectionManager::AcceptConnection(const std::shared_ptr<ISocketAdapter>& 
     {
         _out_connections[address] = socket;
         Log(INFO)<<"Accepting connection from "<<address.c_str()<<"\n";
+
+        if(_set_socket_handlers)
+        {
+            _set_socket_handlers(socket);
+        }
     } 
+}
+
+void ConnectionManager::SetSocketHandlers(std::function<void(const std::shared_ptr<ISocketAdapter>&)> callback)
+{
+    _set_socket_handlers = callback;
 }

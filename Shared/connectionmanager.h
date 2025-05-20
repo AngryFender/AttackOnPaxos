@@ -6,6 +6,7 @@
 #include "acceptoradapter.h"
 #include "iacceptoradapter.h"
 #include "iconnectionmanager.h"
+#include "logger.h"
 
 class ConnectionManager: public IConnectionManager
 {
@@ -25,6 +26,8 @@ public:
     bool GetConnection(const std::string address, std::shared_ptr<ISocketAdapter>& socketAdapter) const override;
     std::map<std::string, std::shared_ptr<ISocketAdapter>> GetConnections() const override;
     void AcceptConnection(const std::shared_ptr<ISocketAdapter>&) override;
+    void SetSocketHandlers(std::function<void(const std::shared_ptr<ISocketAdapter>& )> callback) override;
+
     ~ConnectionManager() override = default;
 
     ConnectionManager(const ConnectionManager&) = delete;
@@ -40,6 +43,7 @@ private:
     boost::asio::io_context& _io_context;
     std::map<std::string, std::shared_ptr<ISocketAdapter>> _out_connections;
     std::shared_ptr<IAcceptorAdapter> _acceptor;
+    std::function<void(const std::shared_ptr<ISocketAdapter>&)> _set_socket_handlers;
 };
 
 
