@@ -1,9 +1,7 @@
 #ifndef CONNECTIONMANAGER_H
 #define CONNECTIONMANAGER_H
-#include <iostream>
 #include <shared_mutex>
 
-#include "acceptoradapter.h"
 #include "iacceptoradapter.h"
 #include "iconnectionmanager.h"
 #include "logger.h"
@@ -21,14 +19,19 @@ public:
         _acceptor->open();
     };
 
+    ~ConnectionManager() override
+    {
+        ConnectionManager::ClearAllConnections();
+    };
+
     void AddConnection(const std::string& address, const tcp::endpoint& endpoint, std::shared_ptr<ISocketAdapter>& socket) override;
     void RemoveConnection(const std::string address) override;
     bool GetConnection(const std::string address, std::shared_ptr<ISocketAdapter>& socketAdapter) const override;
     std::map<std::string, std::shared_ptr<ISocketAdapter>> GetConnections() const override;
     void AcceptConnection(const std::shared_ptr<ISocketAdapter>&) override;
     void SetSocketHandlers(std::function<void(const std::shared_ptr<ISocketAdapter>& )> callback) override;
+    void ClearAllConnections() override;
 
-    ~ConnectionManager() override = default;
 
     ConnectionManager(const ConnectionManager&) = delete;
     ConnectionManager& operator=(const ConnectionManager&) = delete;

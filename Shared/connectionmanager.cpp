@@ -64,3 +64,14 @@ void ConnectionManager::SetSocketHandlers(std::function<void(const std::shared_p
 {
     _set_socket_handlers = callback;
 }
+
+void ConnectionManager::ClearAllConnections()
+{
+    for (auto connection_pair : _out_connections)
+    {
+        auto socket = connection_pair.second;
+        socket->set_receive_callback(nullptr);
+        socket->set_send_callback(nullptr);
+        socket->close();
+    }
+}

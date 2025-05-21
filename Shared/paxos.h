@@ -15,7 +15,10 @@ public:
           });
      }
 
-     ~Paxos() override = default;
+     ~Paxos() override
+     {
+          _manager.ClearAllConnections();
+     };
      void ReceivePacket(const boost::system::error_code& error, std::vector<uint8_t>& data) override;
      void SendPrepare(const uint64_t id) override;
      void SendPromise(const uint64_t id, const bool accept, std::shared_ptr<ISocketAdapter> socket) override;
