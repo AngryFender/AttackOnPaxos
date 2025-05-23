@@ -11,7 +11,7 @@ namespace utility
             return false;
         }
 
-        const uint32_t packet_len = (buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3] + 4;
+        const uint32_t packet_len = ((buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3]) + 4;
 
         if(buffer.size()< packet_len )
         {
@@ -25,6 +25,14 @@ namespace utility
         }
 
         return true;
+    }
+
+    template <typename T>
+    void append_bytes(std::vector<uint8_t>& buffer, const T& value)
+    {
+        static_assert(std::is_trivially_copyable_v<T>, "Type must be trivially copyable");
+        const uint8_t * ptr = reinterpret_cast<const uint8_t>(&value);
+        buffer.insert(buffer.end(), ptr, ptr + sizeof(T));
     }
 }
 
