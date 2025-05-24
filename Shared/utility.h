@@ -31,7 +31,7 @@ namespace utility
     void append_bytes(std::vector<uint8_t>& buffer, const T& value)
     {
         static_assert(std::is_trivially_copyable_v<T>, "Type must be trivially copyable");
-        const uint8_t * ptr = reinterpret_cast<const uint8_t>(&value);
+        const uint8_t * ptr = reinterpret_cast<const uint8_t*>(&value);
         buffer.insert(buffer.end(), ptr, ptr + sizeof(T));
     }
 }
