@@ -2,6 +2,7 @@
 #include "isocketadapter.h"
 #include "logger.h"
 #include "packet.h"
+#include "utility.h"
 
 void Paxos::SetSocketHandlers(const std::shared_ptr<ISocketAdapter>& socket)
 {
@@ -36,13 +37,18 @@ void Paxos::SendPrepare(const uint64_t id)
 {
     Prepare p{};
     p.id = htonl(id);
-    p.type = static_cast<uint8_t>(state::Prepare);
+    p.type = static_cast<uint32_t>(state::Prepare);
     p.length = htonl(sizeof(p.id) + sizeof (p.type));
 
-    for(auto& connection_pair: _manager.GetConnections())
+    std::vector<uint8_t> buffer;
+    utility::append_bytes(buffer, p.length);
+    utility::append_bytes(buffer, p.id);
+    utility::append_bytes(buffer, p.type);
+
+    for(const auto& connection_pair: _manager.GetConnections())
     {
-        auto socket = connection_pair.second;
-        socket->async_send(boost::asio::const_buffer(&p, sizeof(p)));
+        const auto socket = connection_pair.second;
+        socket->async_send((buffer));
     }
 }
 
@@ -54,7 +60,13 @@ void Paxos::SendPromise(const uint64_t id, const bool accept, std::shared_ptr<IS
     p.accept = static_cast<uint8_t>(accept);
     p.length = htonl(sizeof(p.id) + sizeof (p.type));
 
-    socket->async_send(boost::asio::const_buffer(&p, sizeof(p)));
+    std::vector<uint8_t> buffer;
+    utility::append_bytes(buffer, p.length);
+    utility::append_bytes(buffer, p.id);
+    utility::append_bytes(buffer, p.type);
+    utility::append_bytes(buffer, p.accept);
+
+    socket->async_send((buffer));
 }
 
 void Paxos::SendAccept(const uint64_t id, const uint64_t value)
@@ -65,10 +77,16 @@ void Paxos::SendAccept(const uint64_t id, const uint64_t value)
     a.value = htonl(value);
     a.length = htonl(sizeof(a.id) + sizeof(a.type) + sizeof(a.value));
 
+    std::vector<uint8_t> buffer;
+    utility::append_bytes(buffer, a.length);
+    utility::append_bytes(buffer, a.id);
+    utility::append_bytes(buffer, a.type);
+    utility::append_bytes(buffer, a.value);
+
     for(const auto& connection_pair: _manager.GetConnections())
     {
         const auto& socket = connection_pair.second;
-        socket->async_send(boost::asio::const_buffer(&a,sizeof(a)));
+        socket->async_send(buffer);
     }
 }
 
@@ -81,5 +99,12 @@ void Paxos::SendResponse(uint64_t id, const uint64_t value, const bool accept, s
     r.value = htonl(value);
     r.length = htonl(sizeof(r.id) + sizeof(r.type) + sizeof(r.accept) + sizeof(value));
 
-    socket->async_send(boost::asio::buffer(&r, sizeof(r)));
+    std::vector<uint8_t> buffer;
+    utility::append_bytes(buffer, r.length);
+    utility::append_bytes(buffer, r.id);
+    utility::append_bytes(buffer, r.type);
+    utility::append_bytes(buffer, r.accept);
+    utility::append_bytes(buffer, r.value);
+
+    socket->async_send(buffer);
 }

@@ -16,7 +16,7 @@ public:
     void set_receive_callback(std::function<void(const boost::system::error_code&, std::vector<uint8_t>& rawData)> callback) override;
     void set_send_callback(std::function<void(const boost::system::error_code&)> callback) override;
     void start_async_receive() override;
-    void async_send(const boost::asio::const_buffer& message) override;
+    void async_send(std::vector<uint8_t>& message) override;
     void async_connect(const tcp::endpoint& peer_endpoint, const std::function<void(const boost::system::error_code&)> callback) override;
     void close() override;
 private:
@@ -25,7 +25,7 @@ private:
     boost::circular_buffer<uint8_t> _internal_buff;
     std::vector<uint8_t> _packet_data;
     std::vector<uint8_t> _temp_data;
-    std::queue<boost::asio::const_buffer> _outbounds;
+    std::queue<std::vector<uint8_t>> _outbounds;
     std::function<void(const boost::system::error_code&)> _send_callback;
     std::function<void(const boost::system::error_code&, std::vector<uint8_t>& rawData)> _receive_callback;
     void start_async_send();

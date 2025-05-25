@@ -50,6 +50,7 @@ void SocketAdapter::start_async_receive()
         {
             //callback the message handler
             self->_receive_callback(err, self->_packet_data);
+            self->_packet_data.clear();
         }
 
         //rehook
@@ -57,9 +58,9 @@ void SocketAdapter::start_async_receive()
     });
 }
 
-void SocketAdapter::async_send(const boost::asio::const_buffer& message)
+void SocketAdapter::async_send(std::vector<uint8_t>& message)
 {
-    _outbounds.emplace(message);
+    _outbounds.push(message);
 
     if (!_write_in_progress)
     {
@@ -71,7 +72,8 @@ void SocketAdapter::async_send(const boost::asio::const_buffer& message)
 void SocketAdapter::start_async_send()
 {
     auto self = shared_from_this();
-    async_write(_socket, _outbounds.front(), [self](const boost::system::error_code& error, size_t size)
+    const auto buffer = boost::asio::buffer(_outbounds.front());
+    async_write(_socket, buffer, [self](const boost::system::error_code& error, size_t size)
     {
         self->_outbounds.pop();
         if (self->_outbounds.empty() || error)
