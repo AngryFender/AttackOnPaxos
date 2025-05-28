@@ -6,7 +6,7 @@
 
 void Paxos::SetSocketHandlers(const std::shared_ptr<ISocketAdapter>& socket)
 {
-    socket->set_receive_callback([this](const boost::system::error_code& code, std::vector<uint8_t>& data)
+    socket->set_receive_callback([this](const boost::system::error_code& code, std::vector<char>& data)
     {
         this->ReceivePacket(code, data);
     });
@@ -23,7 +23,7 @@ void Paxos::SetSocketHandlers(const std::shared_ptr<ISocketAdapter>& socket)
     });
 }
 
-void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<uint8_t>& data)
+void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<char>& data)
 {
     uint64_t id = 0;
     for(int i = 4; i < 12; ++i)
@@ -40,7 +40,7 @@ void Paxos::SendPrepare(const uint64_t id)
     p.type = static_cast<uint32_t>(state::Prepare);
     p.length = htonl(sizeof(p.id) + sizeof (p.type));
 
-    std::vector<uint8_t> buffer;
+    std::vector<char> buffer;
     utility::append_bytes(buffer, p.length);
     utility::append_bytes(buffer, p.id);
     utility::append_bytes(buffer, p.type);
@@ -60,7 +60,7 @@ void Paxos::SendPromise(const uint64_t id, const bool accept, std::shared_ptr<IS
     p.accept = static_cast<uint8_t>(accept);
     p.length = htonl(sizeof(p.id) + sizeof (p.type));
 
-    std::vector<uint8_t> buffer;
+    std::vector<char> buffer;
     utility::append_bytes(buffer, p.length);
     utility::append_bytes(buffer, p.id);
     utility::append_bytes(buffer, p.type);
@@ -77,7 +77,7 @@ void Paxos::SendAccept(const uint64_t id, const uint64_t value)
     a.value = htonl(value);
     a.length = htonl(sizeof(a.id) + sizeof(a.type) + sizeof(a.value));
 
-    std::vector<uint8_t> buffer;
+    std::vector<char> buffer;
     utility::append_bytes(buffer, a.length);
     utility::append_bytes(buffer, a.id);
     utility::append_bytes(buffer, a.type);
@@ -99,7 +99,7 @@ void Paxos::SendResponse(uint64_t id, const uint64_t value, const bool accept, s
     r.value = htonl(value);
     r.length = htonl(sizeof(r.id) + sizeof(r.type) + sizeof(r.accept) + sizeof(value));
 
-    std::vector<uint8_t> buffer;
+    std::vector<char> buffer;
     utility::append_bytes(buffer, r.length);
     utility::append_bytes(buffer, r.id);
     utility::append_bytes(buffer, r.type);

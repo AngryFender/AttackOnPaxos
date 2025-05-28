@@ -4,7 +4,7 @@
 
 namespace utility
 {
-    inline bool parse_message(boost::circular_buffer<uint8_t>& buffer, std::vector<uint8_t>& packet_data)
+    inline bool parse_message(boost::circular_buffer<char>& buffer, std::vector<char>& packet_data)
     {
         if (buffer.size() < 4)
         {
@@ -27,11 +27,19 @@ namespace utility
         return true;
     }
 
+    // template <typename T>
+    // void append_bytes(std::vector<uint8_t>& buffer, const T& value)
+    // {
+    //     static_assert(std::is_trivially_copyable_v<T>, "Type must be trivially copyable");
+    //     const uint8_t * ptr = reinterpret_cast<const uint8_t*>(&value);
+    //     buffer.insert(buffer.end(), ptr, ptr + sizeof(T));
+    // }
+
     template <typename T>
-    void append_bytes(std::vector<uint8_t>& buffer, const T& value)
+    void append_bytes(std::vector<char>& buffer, const T& value)
     {
         static_assert(std::is_trivially_copyable_v<T>, "Type must be trivially copyable");
-        const uint8_t * ptr = reinterpret_cast<const uint8_t*>(&value);
+        const char * ptr = reinterpret_cast<const char*>(&value);
         buffer.insert(buffer.end(), ptr, ptr + sizeof(T));
     }
 }
