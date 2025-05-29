@@ -27,20 +27,42 @@ namespace utility
         return true;
     }
 
-    // template <typename T>
-    // void append_bytes(std::vector<uint8_t>& buffer, const T& value)
-    // {
-    //     static_assert(std::is_trivially_copyable_v<T>, "Type must be trivially copyable");
-    //     const uint8_t * ptr = reinterpret_cast<const uint8_t*>(&value);
-    //     buffer.insert(buffer.end(), ptr, ptr + sizeof(T));
-    // }
-
     template <typename T>
     void append_bytes(std::vector<char>& buffer, const T& value)
     {
         static_assert(std::is_trivially_copyable_v<T>, "Type must be trivially copyable");
         const char * ptr = reinterpret_cast<const char*>(&value);
         buffer.insert(buffer.end(), ptr, ptr + sizeof(T));
+    }
+
+    inline uint16_t bytes_to_u16int(const int start, const int end, const std::vector<char>& data)
+    {
+        uint16_t num = 0;
+        for (int i = start; i < end; ++i)
+        {
+            num = static_cast<uint16_t>(data[i] << ((i - start) * 2)) | num;
+        }
+        return num;
+    }
+
+    inline uint32_t bytes_to_u32int(const int start, const int end, const std::vector<char>& data)
+    {
+        uint32_t num = 0;
+        for (int i = start; i <= end; ++i)
+        {
+            num = static_cast<uint32_t>(data[i] << ((i - start) * 4)) | num;
+        }
+        return num;
+    }
+
+    inline uint64_t bytes_to_u64int(const int start, const int end, const std::vector<char>& data)
+    {
+        uint64_t num = 0;
+        for (int i = start; i <= end; ++i)
+        {
+            num = static_cast<uint64_t>(data[i] << ((i - start) * 8)) | num;
+        }
+        return num;
     }
 }
 
