@@ -64,6 +64,16 @@ namespace utility
         }
         return num;
     }
+
+    uint64_t htonl64(uint64_t value)
+    {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+        return (static_cast<uint64_t>(htonl(value & 0xFFFFFFFF)) << 32) | htonl(value >> 32);
+#else
+        return value;
+#endif
+    }
+
 }
 
 #endif //UTILITY_H
