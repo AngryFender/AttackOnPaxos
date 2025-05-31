@@ -76,4 +76,14 @@ namespace utility
 
 }
 
+
+    uint64_t ntohl64(uint64_t value) {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+        return (static_cast<uint64_t>(ntohl(value & 0xFFFFFFFF)) << 32) |
+           ntohl(value >> 32);
+#else
+        return value;
+#endif
+}
+
 #endif //UTILITY_H
