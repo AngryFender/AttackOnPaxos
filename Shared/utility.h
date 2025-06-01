@@ -35,37 +35,18 @@ namespace utility
         buffer.insert(buffer.end(), ptr, ptr + sizeof(T));
     }
 
-    inline uint16_t bytes_to_u16int(const int start, const int end, const std::vector<char>& data)
+    template <typename T>
+    T bytes_to_uint(const int start, const int end, const std::vector<char>& data)
     {
-        uint16_t num = 0;
-        for (int i = start; i < end; ++i)
+        T num= 0;
+        for(int i = start; i <= end; ++i)
         {
-            num = static_cast<uint16_t>(data[i] << ((i - start) * 2)) | num;
+            num = (static_cast<T>(data[i]) << ((i - start) * 8)) | num;
         }
         return num;
     }
 
-    inline uint32_t bytes_to_u32int(const int start, const int end, const std::vector<char>& data)
-    {
-        uint32_t num = 0;
-        for (int i = start; i <= end; ++i)
-        {
-            num = static_cast<uint32_t>(data[i] << ((i - start) * 4)) | num;
-        }
-        return num;
-    }
-
-    inline uint64_t bytes_to_u64int(const int start, const int end, const std::vector<char>& data)
-    {
-        uint64_t num = 0;
-        for (int i = start; i <= end; ++i)
-        {
-            num = static_cast<uint64_t>(data[i] << ((i - start) * 8)) | num;
-        }
-        return num;
-    }
-
-    uint64_t htonl64(uint64_t value)
+    inline uint64_t htonl64(uint64_t value)
     {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
         return (static_cast<uint64_t>(htonl(value & 0xFFFFFFFF)) << 32) | htonl(value >> 32);
@@ -74,16 +55,14 @@ namespace utility
 #endif
     }
 
-}
-
-
-    uint64_t ntohl64(uint64_t value) {
+    inline uint64_t ntohl64(uint64_t value)
+    {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-        return (static_cast<uint64_t>(ntohl(value & 0xFFFFFFFF)) << 32) |
-           ntohl(value >> 32);
+        return (static_cast<uint64_t>(ntohl(value & 0xFFFFFFFF)) << 32) | ntohl(value >> 32);
 #else
         return value;
 #endif
-}
+    }
 
+}
 #endif //UTILITY_H
