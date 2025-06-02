@@ -36,8 +36,8 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
 void Paxos::SendPrepare(const uint64_t id)
 {
     Prepare p{};
-    p.id = htonl(id);
-    p.type = static_cast<uint32_t>(state::Prepare);
+    p.id = utility::htonl64(id);
+    p.type = static_cast<uint8_t>(state::Prepare);
     p.length = htonl(sizeof(p.id) + sizeof (p.type));
 
     std::vector<char> buffer;
@@ -55,7 +55,7 @@ void Paxos::SendPrepare(const uint64_t id)
 void Paxos::SendPromise(const uint64_t id, const bool accept, std::shared_ptr<ISocketAdapter> socket)
 {
     Promise p{};
-    p.id = htonl(id);
+    p.id = utility::htonl64(id);
     p.type = static_cast<uint8_t>(state::Promise);
     p.accept = static_cast<uint8_t>(accept);
     p.length = htonl(sizeof(p.id) + sizeof (p.type));
@@ -72,7 +72,7 @@ void Paxos::SendPromise(const uint64_t id, const bool accept, std::shared_ptr<IS
 void Paxos::SendAccept(const uint64_t id, const uint64_t value)
 {
     Accept a{};
-    a.id = htonl(id);
+    a.id = utility::htonl64(id);
     a.type = static_cast<uint8_t>(state::Prepare);
     a.value = htonl(value);
     a.length = htonl(sizeof(a.id) + sizeof(a.type) + sizeof(a.value));
@@ -93,7 +93,7 @@ void Paxos::SendAccept(const uint64_t id, const uint64_t value)
 void Paxos::SendResponse(uint64_t id, const uint64_t value, const bool accept, std::shared_ptr<ISocketAdapter> socket)
 {
     Response r{};
-    r.id = htonl(id);
+    r.id = utility::htonl64(id);
     r.type = static_cast<uint8_t>(state::Response);
     r.accept = static_cast<uint8_t>(accept);
     r.value = htonl(value);
