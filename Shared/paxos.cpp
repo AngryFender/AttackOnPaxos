@@ -25,12 +25,20 @@ void Paxos::SetSocketHandlers(const std::shared_ptr<ISocketAdapter>& socket)
 
 void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<char>& data)
 {
-    uint64_t id = 0;
-    for(int i = 4; i < 12; ++i)
+    const uint64_t id = utility::ntohl64(utility::bytes_to_uint<uint64_t>(4, 11, data));
+
+    switch (id)
     {
-        id = static_cast<uint64_t>(data[i]<<((i-4)*8)) | id;
+    case state::Prepare: break;
+    case state::Promise: break;
+    case state::Accept: break;
+    case state::Response: break;
+    default:
     }
-    Log(INFO) << "receiving "<<std::to_string(ntohl(id)).c_str() << "\n";
+
+    Log(INFO) << "packet size:"<<std::to_string(ntohl(utility::bytes_to_uint<uint32_t>(0,3,data))).c_str() << " ";
+    Log(INFO) << "receiving id:" << std::to_string(id).c_str() << " ";
+    Log(INFO) << "receiving type:"<<std::to_string(data[12]).c_str() << "\n";
 }
 
 void Paxos::SendPrepare(const uint64_t id)
