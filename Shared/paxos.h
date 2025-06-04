@@ -7,7 +7,7 @@
 class Paxos : public IStrategy
 {
 public:
-     explicit Paxos(IConnectionManager& manager):_manager(manager)
+     explicit Paxos(IConnectionManager& manager):_manager(manager), _message_id(0)
      {
           _manager.SetSocketHandlers([this](const std::shared_ptr<ISocketAdapter>& socket)
           {
@@ -19,7 +19,7 @@ public:
      {
           _manager.ClearAllConnections();
      };
-     void ReceivePacket(const boost::system::error_code& error, std::vector<char>& data) override;
+     void ReceivePacket(const boost::system::error_code& error, std::vector<char>& data, std::shared_ptr<ISocketAdapter>& socket) override;
      void SendPrepare(const uint64_t id) override;
      void SendPromise(const uint64_t id, const bool accept, std::shared_ptr<ISocketAdapter> socket) override;
      void SendAccept(uint64_t id, uint64_t value) override;
@@ -27,6 +27,7 @@ public:
      void SetSocketHandlers(const std::shared_ptr<ISocketAdapter>& socket) override;
 private:
      IConnectionManager& _manager;
+     uint64_t _message_id;
 };
 
 

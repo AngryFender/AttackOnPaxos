@@ -6,9 +6,9 @@
 
 void Paxos::SetSocketHandlers(const std::shared_ptr<ISocketAdapter>& socket)
 {
-    socket->set_receive_callback([this](const boost::system::error_code& code, std::vector<char>& data)
+    socket->set_receive_callback([this](const boost::system::error_code& code, std::vector<char>& data, std::shared_ptr<ISocketAdapter> socket)
     {
-        this->ReceivePacket(code, data);
+        this->ReceivePacket(code, data, socket);
     });
     socket->start_async_receive();
 
@@ -23,7 +23,7 @@ void Paxos::SetSocketHandlers(const std::shared_ptr<ISocketAdapter>& socket)
     });
 }
 
-void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<char>& data)
+void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<char>& data, std::shared_ptr<ISocketAdapter>& socket)
 {
     const uint64_t id = utility::ntohl64(utility::bytes_to_uint<uint64_t>(4, 11, data));
 
