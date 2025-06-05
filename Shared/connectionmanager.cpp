@@ -39,6 +39,11 @@ bool ConnectionManager::GetConnection(const std::string address, std::shared_ptr
     return false;
 }
 
+int ConnectionManager::GetConnectionCount() const
+{
+   return _out_connections.size();
+}
+
 std::map<std::string, std::shared_ptr<ISocketAdapter>> ConnectionManager::GetConnections() const
 {
     std::shared_lock lock(_mutex);

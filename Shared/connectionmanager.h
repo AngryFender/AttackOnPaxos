@@ -27,6 +27,7 @@ public:
     void AddConnection(const std::string& address, const tcp::endpoint& endpoint, std::shared_ptr<ISocketAdapter>& socket) override;
     void RemoveConnection(const std::string address) override;
     bool GetConnection(const std::string address, std::shared_ptr<ISocketAdapter>& socketAdapter) const override;
+    int GetConnectionCount() const override;
     std::map<std::string, std::shared_ptr<ISocketAdapter>> GetConnections() const override;
     void AcceptConnection(const std::shared_ptr<ISocketAdapter>&) override;
     void SetSocketHandlers(std::function<void(const std::shared_ptr<ISocketAdapter>& )> callback) override;

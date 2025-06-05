@@ -26,19 +26,30 @@ void Paxos::SetSocketHandlers(const std::shared_ptr<ISocketAdapter>& socket)
 void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<char>& data, std::shared_ptr<ISocketAdapter>& socket)
 {
     const uint64_t id = utility::ntohl64(utility::bytes_to_uint<uint64_t>(4, 11, data));
+    const auto type = static_cast<state>(data[12]);
 
-    switch (id)
+    switch (type)
     {
-    case state::Prepare: break;
-    case state::Promise: break;
+    case state::Prepare:
+        {
+            const bool accept = id > _message_id;
+            SendPromise(id, accept, socket);
+            break;
+        }
+    case state::Promise:
+        {
+            //TODO count all the prepare accept responses
+            _prepare_accept_count ++;
+            const int majority_count = (_manager.GetConnectionCount() + 1) / 2;
+            break;
+        }
     case state::Accept: break;
     case state::Response: break;
-    default:
     }
 
     Log(INFO) << "packet size:"<<std::to_string(ntohl(utility::bytes_to_uint<uint32_t>(0,3,data))).c_str() << " ";
     Log(INFO) << "receiving id:" << std::to_string(id).c_str() << " ";
-    Log(INFO) << "receiving type:"<<std::to_string(data[12]).c_str() << "\n";
+    Log(INFO) << "receiving type:"<<std::to_string(static_cast<uint8_t>(type)).c_str() << "\n";
 }
 
 void Paxos::SendPrepare(const uint64_t id)
