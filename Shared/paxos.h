@@ -29,6 +29,7 @@ private:
      IConnectionManager& _manager;
      uint64_t _message_id;
      uint8_t _prepare_accept_count;
+     uint64_t _value;
 };
 
 

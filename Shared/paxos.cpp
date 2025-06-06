@@ -33,14 +33,17 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
     case state::Prepare:
         {
             const bool accept = id > _message_id;
-            SendPromise(id, accept, socket);
+            SendPromise(++_message_id, accept, socket);
             break;
         }
     case state::Promise:
         {
-            //TODO count all the prepare accept responses
             _prepare_accept_count ++;
             const int majority_count = (_manager.GetConnectionCount() + 1) / 2;
+            if(_prepare_accept_count >= majority_count)
+            {
+                SendAccept(++_message_id, _value);
+            }
             break;
         }
     case state::Accept: break;
@@ -69,6 +72,8 @@ void Paxos::SendPrepare(const uint64_t id)
         const auto socket = connection_pair.second;
         socket->async_send((buffer));
     }
+
+    _prepare_accept_count = 0;
 }
 
 void Paxos::SendPromise(const uint64_t id, const bool accept, std::shared_ptr<ISocketAdapter> socket)
