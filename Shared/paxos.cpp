@@ -38,7 +38,8 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
         }
     case state::Promise:
         {
-            _prepare_accept_count ++;
+            const bool accepted = static_cast<bool>(data[13]);
+            accepted && ++_prepare_accept_count;
             const int majority_count = (_manager.GetConnectionCount() + 1) / 2;
             if(_prepare_accept_count >= majority_count)
             {
