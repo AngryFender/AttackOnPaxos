@@ -47,7 +47,14 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
             }
             break;
         }
-    case state::Accept: break;
+    case state::Accept:
+        {
+            const uint64_t value = utility::ntohl64(utility::bytes_to_uint<uint64_t>(13,20, data));
+            const bool accept = id > _message_id;
+            _value = accept ? value : _value;
+            SendResponse(++_message_id, value, accept, socket);
+            break;
+        }
     case state::Response: break;
     }
 
@@ -83,7 +90,7 @@ void Paxos::SendPromise(const uint64_t id, const bool accept, std::shared_ptr<IS
     p.id = utility::htonl64(id);
     p.type = static_cast<uint8_t>(state::Promise);
     p.accept = static_cast<uint8_t>(accept);
-    p.length = htonl(sizeof(p.id) + sizeof (p.type));
+    p.length = htonl(sizeof(p.id) + sizeof (p.type)+ sizeof(p.accept));
 
     std::vector<char> buffer;
     utility::append_bytes(buffer, p.length);
@@ -98,7 +105,7 @@ void Paxos::SendAccept(const uint64_t id, const uint64_t value)
 {
     Accept a{};
     a.id = utility::htonl64(id);
-    a.type = static_cast<uint8_t>(state::Prepare);
+    a.type = static_cast<uint8_t>(state::Accept);
     a.value = htonl(value);
     a.length = htonl(sizeof(a.id) + sizeof(a.type) + sizeof(a.value));
 
