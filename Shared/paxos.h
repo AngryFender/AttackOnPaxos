@@ -7,7 +7,7 @@
 class Paxos : public IStrategy
 {
 public:
-     explicit Paxos(IConnectionManager& manager): _manager(manager), _promise_id(0), _prepare_accept_count(0)
+     explicit Paxos(IConnectionManager& manager): _manager(manager), _promise_id(0), _accept_node_count(0),_prepare_id_internal_use(0)
      {
           _manager.SetSocketHandlers([this](const std::shared_ptr<ISocketAdapter>& socket)
           {
@@ -28,8 +28,9 @@ public:
 private:
      IConnectionManager& _manager;
      uint64_t _promise_id;
-     uint8_t _prepare_accept_count;
+     uint8_t _accept_node_count;
      uint64_t _value;
+     uint64_t _prepare_id_internal_use;
 };
 
 
