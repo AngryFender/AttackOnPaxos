@@ -53,9 +53,13 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
             }
 
             const int majority_count = (_manager.GetConnectionCount() + 1) / 2;
-            if(_accept_node_count >= majority_count)
+            if (_accept_node_count >= majority_count)
             {
                 SendAccept(_promise_id, _value);
+            }
+            else
+            {
+                SendPrepare(++_promise_id);
             }
             break;
         }
@@ -64,7 +68,7 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
             const uint64_t value = utility::ntohl64(utility::bytes_to_uint<uint64_t>(13,20, data));
 
             bool accept = false;
-            if(id>_promise_id)
+            if(id>=_promise_id)
             {
                 accept = true;
                 _value = value;
