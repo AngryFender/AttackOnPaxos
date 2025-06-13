@@ -33,33 +33,28 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
     case state::Prepare:
         {
             bool accept = false;
-            if(id>_promise_id)
+            if(id>_local_promise_id)
             {
                 accept = true;
-                _promise_id = id;
+                _local_promise_id = id;
             }
-            SendPromise(_promise_id, accept, socket);
+            SendPromise(_local_promise_id, accept, socket);
             break;
         }
     case state::Promise:
         {
             const bool accepted = static_cast<bool>(data[13]);
-            accepted && ++_accept_node_count;
+            _promise_store.push_back(accepted);
 
-            if(_prepare_id_internal_use > _promise_id)
-            {
-                ++_accept_node_count;
-                _promise_id = _prepare_id_internal_use;
-            }
+            const int accept_count = std::count(_promise_store.begin(), _promise_store.end(), true);
 
-            const int majority_count = (_manager.GetConnectionCount() + 1) / 2;
-            if (_accept_node_count >= majority_count)
+            if ( accept_count >= (_manager.GetConnectionCount() + 1) / 2)
             {
-                SendAccept(_promise_id, _value);
+                SendAccept(_local_promise_id, _value);
             }
             else
             {
-                SendPrepare(++_promise_id);
+                SendPrepare(++_local_promise_id);
             }
             break;
         }
@@ -68,14 +63,14 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
             const uint64_t value = utility::ntohl64(utility::bytes_to_uint<uint64_t>(13,20, data));
 
             bool accept = false;
-            if(id>=_promise_id)
+            if(id>=_local_promise_id)
             {
                 accept = true;
                 _value = value;
-                _promise_id = id;
+                _local_promise_id = id;
             }
 
-            SendResponse(_promise_id, value, accept, socket);
+            SendResponse(_local_promise_id, value, accept, socket);
             break;
         }
     case state::Response: break;
@@ -104,8 +99,10 @@ void Paxos::SendPrepare(const uint64_t id)
         socket->async_send((buffer));
     }
 
-    _accept_node_count = 0;
-    _prepare_id_internal_use = id;
+    _promise_store.clear();
+    _promise_store.push_back(id > _local_promise_id);
+    _local_promise_id = std::max(id, _local_promise_id);
+
 }
 
 void Paxos::SendPromise(const uint64_t id, const bool accept, std::shared_ptr<ISocketAdapter> socket)
