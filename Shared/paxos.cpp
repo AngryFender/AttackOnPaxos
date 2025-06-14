@@ -35,6 +35,7 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
             bool accept = false;
             if(id>_local_promise_id)
             {
+                _local_state = state::Accept;
                 accept = true;
                 _local_promise_id = id;
             }
@@ -48,9 +49,10 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
 
             const int accept_count = std::count(_promise_store.begin(), _promise_store.end(), true);
 
-            if ( accept_count >= (_manager.GetConnectionCount() + 1) / 2)
+            if ((accept_count >= (_manager.GetConnectionCount() + 1) / 2) && (_local_state == state::Promise))
             {
-                SendAccept(_local_promise_id, _value);
+                _local_state = state::Accept;
+                SendAccept(_local_promise_id, _local_value);
             }
             else
             {
@@ -66,7 +68,7 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
             if(id>=_local_promise_id)
             {
                 accept = true;
-                _value = value;
+                _local_value = value;
                 _local_promise_id = id;
             }
 
@@ -99,10 +101,10 @@ void Paxos::SendPrepare(const uint64_t id)
         socket->async_send((buffer));
     }
 
+    _local_state = state::Promise;
     _promise_store.clear();
     _promise_store.push_back(id > _local_promise_id);
     _local_promise_id = std::max(id, _local_promise_id);
-
 }
 
 void Paxos::SendPromise(const uint64_t id, const bool accept, std::shared_ptr<ISocketAdapter> socket)
