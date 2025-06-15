@@ -48,13 +48,14 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
             _promise_store.push_back(accepted);
 
             const int accept_count = std::count(_promise_store.begin(), _promise_store.end(), true);
+            const int majority_count = (_manager.GetConnectionCount() + 1)/2 ;
 
-            if ((accept_count >= (_manager.GetConnectionCount() + 1) / 2) && (_local_state == state::Promise))
+            if (accept_count >= majority_count && _local_state == state::Promise)
             {
                 _local_state = state::Accept;
                 SendAccept(_local_promise_id, _local_value);
             }
-            else
+            if(accept_count < majority_count && _promise_store.size() == _manager.GetConnectionCount())
             {
                 SendPrepare(++_local_promise_id);
             }
@@ -65,11 +66,12 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
             const uint64_t value = utility::ntohl64(utility::bytes_to_uint<uint64_t>(13,20, data));
 
             bool accept = false;
-            if(id>=_local_promise_id)
+            if (id >= _local_promise_id && _local_state == state::Accept)
             {
                 accept = true;
                 _local_value = value;
                 _local_promise_id = id;
+                _local_state = state::Prepare;
             }
 
             SendResponse(_local_promise_id, value, accept, socket);
