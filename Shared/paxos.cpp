@@ -94,6 +94,7 @@ void Paxos::SendPrepare(const uint64_t id)
 
     std::vector<char> buffer;
     utility::append_bytes(buffer, p.length);
+    utility::append_bytes(buffer, _node_id);
     utility::append_bytes(buffer, p.id);
     utility::append_bytes(buffer, p.type);
 
@@ -119,6 +120,7 @@ void Paxos::SendPromise(const uint64_t id, const bool accept, std::shared_ptr<IS
 
     std::vector<char> buffer;
     utility::append_bytes(buffer, p.length);
+    utility::append_bytes(buffer, _node_id);
     utility::append_bytes(buffer, p.id);
     utility::append_bytes(buffer, p.type);
     utility::append_bytes(buffer, p.accept);
@@ -136,6 +138,7 @@ void Paxos::SendAccept(const uint64_t id, const uint64_t value)
 
     std::vector<char> buffer;
     utility::append_bytes(buffer, a.length);
+    utility::append_bytes(buffer, _node_id);
     utility::append_bytes(buffer, a.id);
     utility::append_bytes(buffer, a.type);
     utility::append_bytes(buffer, a.value);
@@ -158,6 +161,7 @@ void Paxos::SendResponse(uint64_t id, const uint64_t value, const bool accept, s
 
     std::vector<char> buffer;
     utility::append_bytes(buffer, r.length);
+    utility::append_bytes(buffer, _node_id);
     utility::append_bytes(buffer, r.id);
     utility::append_bytes(buffer, r.type);
     utility::append_bytes(buffer, r.accept);

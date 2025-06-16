@@ -1,5 +1,4 @@
 #include <iostream>
-#include "../Shared/plainconnection.h"
 #include "../Shared/connectionmanager.h"
 #include "../Shared/acceptoradapter.h"
 #include "../Shared/paxos.h"
@@ -48,12 +47,11 @@ void init_tcp_server()
         std::shared_ptr<ISocketAdapter> socket = std::make_shared<SocketAdapter>(io_context);
 
         connectionManager.AddConnection(address, end_point, socket);
-        Paxos pax(connectionManager);
+        Paxos pax(connectionManager,1);
         boost::asio::deadline_timer timer(io_context, boost::posix_time::seconds(2));
 
         timer.async_wait([&pax, &timer](const boost::system::error_code&)
         {
-            // pax.SendPrepare(69);
             restart_timer(timer,pax);
         });
 

@@ -8,8 +8,9 @@
 class Paxos : public IStrategy
 {
 public:
-     explicit Paxos(IConnectionManager& manager): _manager(manager),
+     explicit Paxos(IConnectionManager& manager, const uint8_t node_id): _manager(manager),
                                                   _local_state(state::Prepare),
+                                                  _node_id(node_id),
                                                   _local_promise_id(0),
                                                   _promise_store(3, false),
                                                   _local_value(0)
@@ -32,6 +33,7 @@ public:
      void SetSocketHandlers(const std::shared_ptr<ISocketAdapter>& socket) override;
 private:
      IConnectionManager& _manager;
+     uint8_t _node_id;
      state _local_state;
      uint64_t _local_promise_id;
      std::vector<bool> _promise_store;

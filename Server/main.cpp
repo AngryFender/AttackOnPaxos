@@ -4,6 +4,10 @@
 #include "../Shared/logger.h"
 #include "../Shared/acceptoradapter.h"
 #include "../Shared/connectionmanager.h"
+#include "../Shared/acceptoradapter.h"
+#include "../Shared/istrategy.h"
+#include "../Shared/paxos.h"
+#include "../Shared/utility.h"
 
 #define PORTNO 3490
 
@@ -33,6 +37,7 @@ void init_tcp_server()
         Log(INFO) << "Starting Server" << "\n";
         boost::asio::io_context io_context;
         ConnectionManager connectionManager(io_context, PORTNO, std::make_shared<AcceptorAdapter>(io_context, PORTNO));
+        Paxos pax(connectionManager,2);
 
         io_context.run();
     }
