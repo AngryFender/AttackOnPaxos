@@ -25,8 +25,9 @@ void Paxos::SetSocketHandlers(const std::shared_ptr<ISocketAdapter>& socket)
 
 void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<char>& data, std::shared_ptr<ISocketAdapter>& socket)
 {
-    const uint64_t id = utility::ntohl64(utility::bytes_to_uint<uint64_t>(4, 11, data));
-    const auto type = static_cast<state>(data[12]);
+    const uint8_t node_id = static_cast<uint8_t>(data[4]);
+    const uint64_t id = utility::ntohl64(utility::bytes_to_uint<uint64_t>(5, 12, data));
+    const auto type = static_cast<state>(data[13]);
 
     switch (type)
     {
@@ -44,7 +45,7 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
         }
     case state::Promise:
         {
-            const bool accepted = static_cast<bool>(data[13]);
+            const bool accepted = static_cast<bool>(data[14]);
             _promise_store.push_back(accepted);
 
             const int accept_count = std::count(_promise_store.begin(), _promise_store.end(), true);
@@ -63,7 +64,7 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
         }
     case state::Accept:
         {
-            const uint64_t value = utility::ntohl64(utility::bytes_to_uint<uint64_t>(13,20, data));
+            const uint64_t value = utility::ntohl64(utility::bytes_to_uint<uint64_t>(14,21, data));
 
             bool accept = false;
             if (id >= _local_promise_id && _local_state == state::Accept)
