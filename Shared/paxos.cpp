@@ -117,7 +117,7 @@ void Paxos::SendPromise(const uint64_t id, const bool accept, std::shared_ptr<IS
     p.id = utility::htonl64(id);
     p.type = static_cast<uint8_t>(state::Promise);
     p.accept = static_cast<uint8_t>(accept);
-    p.length = htonl(sizeof(p.id) + sizeof (p.type)+ sizeof(p.accept));
+    p.length = htonl(sizeof(p.id) + sizeof(_node_id) + sizeof (p.type) + sizeof(p.accept));
 
     std::vector<char> buffer;
     utility::append_bytes(buffer, p.length);
@@ -135,7 +135,7 @@ void Paxos::SendAccept(const uint64_t id, const uint64_t value)
     a.id = utility::htonl64(id);
     a.type = static_cast<uint8_t>(state::Accept);
     a.value = htonl(value);
-    a.length = htonl(sizeof(a.id) + sizeof(a.type) + sizeof(a.value));
+    a.length = htonl(sizeof(a.id) + sizeof(_node_id) + sizeof(a.type) + sizeof(a.value));
 
     std::vector<char> buffer;
     utility::append_bytes(buffer, a.length);
@@ -158,7 +158,7 @@ void Paxos::SendResponse(uint64_t id, const uint64_t value, const bool accept, s
     r.type = static_cast<uint8_t>(state::Response);
     r.accept = static_cast<uint8_t>(accept);
     r.value = htonl(value);
-    r.length = htonl(sizeof(r.id) + sizeof(r.type) + sizeof(r.accept) + sizeof(value));
+    r.length = htonl(sizeof(r.id) + sizeof(_node_id) + sizeof(r.type) + sizeof(r.accept) + sizeof(value));
 
     std::vector<char> buffer;
     utility::append_bytes(buffer, r.length);
