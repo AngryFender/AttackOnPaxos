@@ -13,6 +13,7 @@ public:
                                                   _node_id(node_id),
                                                   _local_promise_id(0),
                                                   _promise_store(3, false),
+                                                  _response_store(3, false),
                                                   _local_value(0)
      {
           _manager.SetSocketHandlers([this](const std::shared_ptr<ISocketAdapter>& socket)
@@ -37,6 +38,7 @@ private:
      state _local_state;
      uint64_t _local_promise_id;
      std::vector<bool> _promise_store;
+     std::vector<bool> _response_store;
      uint64_t _local_value;
 };
 
