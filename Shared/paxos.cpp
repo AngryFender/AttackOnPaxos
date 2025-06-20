@@ -87,14 +87,13 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
             const int accept_count = std::count(_response_store.begin(), _response_store.end(), true);
             const int majority_count = (_manager.GetConnectionCount() + 1)/2 ;
 
-            if (accept_count >= majority_count && _local_state == state::Prepare)
+            if (accept_count >= majority_count && _local_state == state::Accept)
             {
-                _local_state = state::Accept;
-                SendAccept(_local_promise_id, _local_value);
+                _local_state = state::Prepare;
             }
             if(accept_count < majority_count && _promise_store.size() == _manager.GetConnectionCount())
             {
-                SendPrepare(++_local_promise_id);
+                SendAccept(_local_promise_id, _local_value);
             }
         }
         break;
