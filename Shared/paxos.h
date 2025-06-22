@@ -39,6 +39,7 @@ private:
      uint64_t _local_promise_id;
      std::vector<bool> _promise_store;
      std::vector<bool> _response_store;
+     std::vector<uint64_t> _value_store;
      uint64_t _local_value;
 };
 
