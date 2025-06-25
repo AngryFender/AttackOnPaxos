@@ -52,7 +52,7 @@ std::map<std::string, std::shared_ptr<ISocketAdapter>> ConnectionManager::GetCon
 
 void ConnectionManager::AcceptConnection(const std::shared_ptr<ISocketAdapter>& socket)
 {
-    const std::string address = socket->getSocket().remote_endpoint().address().to_string() ;
+    const std::string address = socket->getSocket().remote_endpoint().address().to_string() + ":" + std::to_string(socket->getSocket().remote_endpoint().port());
     if (!_out_connections.contains(address))
     {
         _out_connections[address] = socket;
