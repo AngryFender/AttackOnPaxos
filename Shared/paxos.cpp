@@ -19,20 +19,22 @@ void Paxos::SetSocketHandlers(const std::shared_ptr<ISocketAdapter>& socket)
             Log(ERROR) << "Sending paxos packet error" << code.message().c_str() << "\n";
             return;
         }
-        Log(INFO) << "Paxos sent\n";
     });
 }
 
 void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<char>& data, std::shared_ptr<ISocketAdapter>& socket)
 {
+    const std::string address = socket->getSocket().remote_endpoint().address().to_string() + ":" + std::to_string(socket->getSocket().remote_endpoint().port());
     const uint8_t node_id = static_cast<uint8_t>(data[4]);
     const uint64_t id = utility::ntohl64(utility::bytes_to_uint<uint64_t>(5, 12, data));
-    const auto type = static_cast<state>(data[13]);
+    const state type = static_cast<state>(data[13]);
 
     switch (type)
     {
     case state::Prepare:
         {
+            Log(INFO)<<"Received Prepare packet from Node :"<<std::to_string(node_id).c_str()<<" @ "<<address.c_str()<<"\n";
+            Log(INFO) << "->Id =" << std::to_string(_local_promise_id).c_str() << "->Value =" << std::to_string(_local_value).c_str() <<"\n\n";
             bool accept = false;
             if(id>_local_promise_id)
             {
@@ -45,6 +47,7 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
         }
     case state::Promise:
         {
+            Log(INFO)<<"Received Promise packet from Node :"<<std::to_string(node_id).c_str()<<" @ "<<address.c_str()<<"\n";
             const bool accepted = static_cast<bool>(data[14]);
             _promise_store.push_back(accepted);
 
@@ -64,6 +67,7 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
         }
     case state::Accept:
         {
+            Log(INFO)<<"Received Accept packet from Node :"<<std::to_string(node_id).c_str()<<" @ "<<address.c_str()<<"\n";
             const uint64_t value = utility::ntohl64(utility::bytes_to_uint<uint64_t>(14,21, data));
 
             bool accept = false;
@@ -76,10 +80,12 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
             }
 
             SendResponse(_local_promise_id, value, accept, socket);
+            Log(INFO) << "->Id =" << std::to_string(_local_promise_id).c_str() << "->Value =" << std::to_string(_local_value).c_str() <<"\n\n";
             break;
         }
     case state::Response:
         {
+            Log(INFO)<<"Received Response packet from Node :"<<std::to_string(node_id).c_str()<<" @ "<<address.c_str()<<"\n";
             const bool accepted = static_cast<bool>(data[14]);
             const uint64_t value = utility::ntohl64(utility::bytes_to_uint<uint64_t>(15, 22, data));
             _response_store.push_back(accepted);
@@ -106,10 +112,6 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
         }
         break;
     }
-
-    Log(INFO) << "packet size:"<<std::to_string(ntohl(utility::bytes_to_uint<uint32_t>(0,3,data))).c_str() << " ";
-    Log(INFO) << "receiving id:" << std::to_string(id).c_str() << " ";
-    Log(INFO) << "receiving type:"<<std::to_string(static_cast<uint8_t>(type)).c_str() << "\n";
 }
 
 void Paxos::SendPrepare(const uint64_t id)
@@ -117,7 +119,7 @@ void Paxos::SendPrepare(const uint64_t id)
     Prepare p{};
     p.id = utility::htonl64(id);
     p.type = static_cast<uint8_t>(state::Prepare);
-    p.length = htonl(sizeof(p.id) + sizeof (p.type));
+    p.length = htonl(sizeof(p.id) + sizeof(_node_id) + sizeof (p.type));
 
     std::vector<char> buffer;
     utility::append_bytes(buffer, p.length);

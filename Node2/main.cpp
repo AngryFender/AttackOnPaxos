@@ -37,7 +37,7 @@ void init_tcp_server()
         std::shared_ptr<ISocketAdapter> socket = std::make_shared<SocketAdapter>(io_context);
 
         connectionManager.AddConnection(address, end_point, socket);
-        Paxos pax(connectionManager,2);
+        Paxos pax(connectionManager,3);
 
         io_context.run();
     }

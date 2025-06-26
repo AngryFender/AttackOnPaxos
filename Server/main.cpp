@@ -37,7 +37,13 @@ void init_tcp_server()
         Log(INFO) << "Starting Server" << "\n";
         boost::asio::io_context io_context;
         ConnectionManager connectionManager(io_context, PORTNO, std::make_shared<AcceptorAdapter>(io_context, PORTNO));
-        Paxos pax(connectionManager,2);
+        Paxos pax(connectionManager,1);
+
+        boost::asio::deadline_timer timer(io_context, boost::posix_time::seconds(2));
+        timer.async_wait([&pax](const boost::system::error_code&)
+        {
+            pax.SendPrepare(21);
+        });
 
         io_context.run();
     }
