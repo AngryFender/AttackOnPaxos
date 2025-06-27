@@ -57,7 +57,7 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
             if (accept_count >= majority_count && _local_state == state::Promise)
             {
                 _local_state = state::Accept;
-                SendAccept(_local_promise_id, _local_value);
+                SendAccept(_local_promise_id, _proposed_value);
             }
             if(accept_count < majority_count && _promise_store.size() == _manager.GetConnectionCount())
             {
@@ -112,6 +112,12 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
         }
         break;
     }
+}
+
+void Paxos::ContributeValue(const uint64_t value)
+{
+    SendPrepare(++_local_promise_id);
+    _proposed_value = value;
 }
 
 void Paxos::SendPrepare(const uint64_t id)

@@ -42,7 +42,7 @@ void init_tcp_server()
         boost::asio::deadline_timer timer(io_context, boost::posix_time::seconds(2));
         timer.async_wait([&pax](const boost::system::error_code&)
         {
-            pax.SendPrepare(21);
+            pax.ContributeValue(21);
         });
 
         io_context.run();
