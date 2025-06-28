@@ -104,6 +104,8 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
             if (accept_count >= majority_count && max_count >= majority_count && _local_state == state::Accept)
             {
                 _local_state = state::Prepare;
+                const auto contribution_status = contribution_status::success;
+                _contribution_handler(contribution_status);
             }
             if(accept_count < majority_count && _promise_store.size() == _manager.GetConnectionCount())
             {
@@ -114,8 +116,9 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
     }
 }
 
-void Paxos::ContributeValue(const uint64_t value)
+void Paxos::ContributeValue(const uint64_t value, std::function<void(const contribution_status&)> handler)
 {
+    _contribution_handler = handler;
     SendPrepare(++_local_promise_id);
     _proposed_value = value;
 }
@@ -169,7 +172,7 @@ void Paxos::SendAccept(const uint64_t id, const uint64_t value)
     Accept a{};
     a.id = utility::htonl64(id);
     a.type = static_cast<uint8_t>(state::Accept);
-    a.value = htonl(value);
+    a.value = utility::htonl64(value);
     a.length = htonl(sizeof(a.id) + sizeof(_node_id) + sizeof(a.type) + sizeof(a.value));
 
     std::vector<char> buffer;

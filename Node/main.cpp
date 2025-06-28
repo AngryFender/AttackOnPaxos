@@ -26,7 +26,7 @@ void init_logs()
 
 void restart_timer(boost::asio::deadline_timer& timer, Paxos& pax)
 {
-    pax.ContributeValue(69);
+    // pax.ContributeValue(69);
     timer.expires_from_now(boost::posix_time::seconds(2));
     timer.async_wait([&pax, &timer](const boost::system::error_code&)
     {
