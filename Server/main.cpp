@@ -42,7 +42,16 @@ void init_tcp_server()
         boost::asio::deadline_timer timer(io_context, boost::posix_time::seconds(2));
         timer.async_wait([&pax](const boost::system::error_code&)
         {
-            pax.ContributeValue(21);
+            pax.ContributeValue(21,[](const contribution_status& status)
+            {
+                if(status == contribution_status::success)
+                {
+                    Log(INFO)<<"Contribution successful\n";
+                }else
+                {
+                    Log(INFO)<<"Contribution failed\n";
+                }
+            });
         });
 
         io_context.run();
