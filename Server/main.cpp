@@ -39,19 +39,23 @@ void init_tcp_server()
         ConnectionManager connectionManager(io_context, PORTNO, std::make_shared<AcceptorAdapter>(io_context, PORTNO));
         Paxos pax(connectionManager,1);
 
-        boost::asio::deadline_timer timer(io_context, boost::posix_time::seconds(2));
-        timer.async_wait([&pax](const boost::system::error_code&)
+        std::thread external_thread([&pax, &io_context]()
         {
-            pax.ContributeValue(21,[](const contribution_status& status)
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+            io_context.post([&pax]()
             {
-                if(status == contribution_status::success)
+                pax.ContributeValue(69, [](const contribution_status& status)
                 {
-                    Log(INFO)<<"Contribution successful\n";
-                }else
-                {
-                    Log(INFO)<<"Contribution failed\n";
-                }
-            });
+                    if (status == contribution_status::success)
+                    {
+                        Log(INFO) << "Contribution successful\n";
+                    }
+                    else
+                    {
+                        Log(INFO) << "Contribution failed\n";
+                    }
+               });
+           });
         });
 
         io_context.run();
