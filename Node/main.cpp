@@ -43,11 +43,34 @@ void init_tcp_server()
         ConnectionManager connectionManager(io_context, PORTNO, std::make_shared<AcceptorAdapter>(io_context, PORTNO));
 
         const std::string address = "127.0.0.1";
-        boost::asio::ip::basic_endpoint<tcp> end_point(boost::asio::ip::address::from_string(address), 3490);
-        std::shared_ptr<ISocketAdapter> socket = std::make_shared<SocketAdapter>(io_context);
+        boost::asio::ip::basic_endpoint<tcp> end_point_node2(boost::asio::ip::address::from_string(address), 3490);
+        std::shared_ptr<ISocketAdapter> socket_node2 = std::make_shared<SocketAdapter>(io_context);
+        connectionManager.AddConnection(address, end_point_node2, socket_node2);
 
-        connectionManager.AddConnection(address, end_point, socket);
-        Paxos pax(connectionManager,2);
+        boost::asio::ip::basic_endpoint<tcp> end_point_node3(boost::asio::ip::address::from_string(address), 3493);
+        std::shared_ptr<ISocketAdapter> socket_node3 = std::make_shared<SocketAdapter>(io_context);
+        connectionManager.AddConnection(address, end_point_node3, socket_node3);
+
+        Paxos pax(connectionManager, 2);
+
+        std::thread external_thread([&pax, &io_context]()
+        {
+            io_context.post([&pax]()
+            {
+                std::this_thread::sleep_for(std::chrono::seconds(10));
+                pax.ContributeValue(70, [](const contribution_status& status)
+                {
+                    if (status == contribution_status::success)
+                    {
+                        Log(INFO) << "Contribution successful\n";
+                    }
+                    else
+                    {
+                        Log(INFO) << "Contribution failed\n";
+                    }
+                });
+            });
+        });
 
         // boost::asio::deadline_timer timer(io_context, boost::posix_time::seconds(2));
         // timer.async_wait([&pax, &timer](const boost::system::error_code&)
