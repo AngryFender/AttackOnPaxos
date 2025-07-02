@@ -11,7 +11,8 @@ void ConnectionManager::AddConnection(const std::string& address, const tcp::end
             return;
         }
         std::unique_lock lock(this->_mutex);
-        this->_out_connections[socket->getSocket().remote_endpoint().address().to_string()] = socket;
+        const std::string full_address = socket->getSocket().remote_endpoint().address().to_string() + ":" + std::to_string(socket->getSocket().remote_endpoint().port());
+        this->_out_connections[full_address] = socket;
         Log(INFO)<<"Connected to " << address.c_str()<<"\n";
 
         if (_set_socket_handlers)
