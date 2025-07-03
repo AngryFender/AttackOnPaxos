@@ -1,19 +1,19 @@
 #include "connectionmanager.h"
 #include "logger.h"
 
-void ConnectionManager::AddConnection(const std::string& address, const tcp::endpoint& endpoint, std::shared_ptr<ISocketAdapter>& socket)
+void ConnectionManager::AddConnection(const tcp::endpoint& endpoint, std::shared_ptr<ISocketAdapter>& socket)
 {
-    socket->async_connect(endpoint,[socket, address,this](const error_code& code)
+    socket->async_connect(endpoint,[socket,this](const error_code& code)
     {
+        const std::string address = socket->getSocket().remote_endpoint().address().to_string() + ":" + std::to_string(socket->getSocket().remote_endpoint().port());
         if(code)
         {
             Log(ERROR)<<"Unable to connect to "<< address.c_str() << code.to_string().c_str() << "\n";
             return;
         }
         std::unique_lock lock(this->_mutex);
-        const std::string full_address = socket->getSocket().remote_endpoint().address().to_string() + ":" + std::to_string(socket->getSocket().remote_endpoint().port());
-        this->_out_connections[full_address] = socket;
-        Log(INFO)<<"Connected to " << address.c_str()<<"\n";
+        this->_out_connections[address] = socket;
+        Log(INFO)<<"Connected from "<<socket->getSocket().local_endpoint().address().to_string().c_str() << ":" << std::to_string(socket->getSocket().local_endpoint().port()).c_str()<<" to " << address.c_str()<<"\n";
 
         if (_set_socket_handlers)
         {

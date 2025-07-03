@@ -24,7 +24,7 @@ public:
         ConnectionManager::ClearAllConnections();
     };
 
-    void AddConnection(const std::string& address, const tcp::endpoint& endpoint, std::shared_ptr<ISocketAdapter>& socket) override;
+    void AddConnection(const tcp::endpoint& endpoint, std::shared_ptr<ISocketAdapter>& socket) override;
     void RemoveConnection(const std::string address) override;
     bool GetConnection(const std::string address, std::shared_ptr<ISocketAdapter>& socketAdapter) const override;
     int GetConnectionCount() const override;
