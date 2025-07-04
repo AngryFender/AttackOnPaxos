@@ -28,7 +28,7 @@ void init_tcp_server()
 {
     try
     {
-        Log(INFO) << "Starting Node" << "\n";
+        Log(INFO) << "Starting Server...listening on " << std::to_string(PORTNO).c_str() << "\n";
         boost::asio::io_context io_context;
         ConnectionManager connectionManager(io_context, PORTNO, std::make_shared<AcceptorAdapter>(io_context, PORTNO));
 
@@ -36,7 +36,7 @@ void init_tcp_server()
         boost::asio::ip::basic_endpoint<tcp> end_point(boost::asio::ip::address::from_string(address), 3490);
         std::shared_ptr<ISocketAdapter> socket = std::make_shared<SocketAdapter>(io_context);
 
-        connectionManager.AddConnection(address, end_point, socket);
+        connectionManager.AddConnection(end_point, socket);
         Paxos pax(connectionManager,3);
 
         io_context.run();

@@ -26,8 +26,18 @@ void init_logs()
 
 void restart_timer(boost::asio::deadline_timer& timer, Paxos& pax)
 {
-    // pax.ContributeValue(69);
-    timer.expires_from_now(boost::posix_time::seconds(2));
+    pax.ContributeValue(70, [](const contribution_status& status)
+    {
+        if (status == contribution_status::success)
+        {
+            Log(INFO) << "Contribution successful\n";
+        }
+        else
+        {
+            Log(INFO) << "Contribution failed\n";
+        }
+    });
+    timer.expires_from_now(boost::posix_time::seconds(5));
     timer.async_wait([&pax, &timer](const boost::system::error_code&)
     {
         restart_timer(timer, pax);
@@ -38,18 +48,18 @@ void init_tcp_server()
 {
     try
     {
-        Log(INFO) << "Starting Node" << "\n";
+        Log(INFO) << "Starting Server...listening on " << std::to_string(PORTNO).c_str() << "\n";
         boost::asio::io_context io_context;
         ConnectionManager connectionManager(io_context, PORTNO, std::make_shared<AcceptorAdapter>(io_context, PORTNO));
 
         const std::string address = "127.0.0.1";
         boost::asio::ip::basic_endpoint<tcp> end_point_node2(boost::asio::ip::address::from_string(address), 3490);
         std::shared_ptr<ISocketAdapter> socket_node2 = std::make_shared<SocketAdapter>(io_context);
-        connectionManager.AddConnection(address, end_point_node2, socket_node2);
+        connectionManager.AddConnection(end_point_node2, socket_node2);
 
         boost::asio::ip::basic_endpoint<tcp> end_point_node3(boost::asio::ip::address::from_string(address), 3493);
         std::shared_ptr<ISocketAdapter> socket_node3 = std::make_shared<SocketAdapter>(io_context);
-        connectionManager.AddConnection(address, end_point_node3, socket_node3);
+        connectionManager.AddConnection(end_point_node3, socket_node3);
 
         Paxos pax(connectionManager, 2);
 
@@ -72,12 +82,12 @@ void init_tcp_server()
             });
         });
 
-        // boost::asio::deadline_timer timer(io_context, boost::posix_time::seconds(2));
+        // boost::asio::deadline_timer timer(io_context, boost::posix_time::seconds(5));
         // timer.async_wait([&pax, &timer](const boost::system::error_code&)
         // {
         //     restart_timer(timer,pax);
         // });
-
+        //
         io_context.run();
     }
     catch (std::exception& e)
