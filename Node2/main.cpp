@@ -34,9 +34,8 @@ void init_tcp_server()
 
         const std::string address = "127.0.0.1";
         boost::asio::ip::basic_endpoint<tcp> end_point(boost::asio::ip::address::from_string(address), 3490);
-        std::shared_ptr<ISocketAdapter> socket = std::make_shared<SocketAdapter>(io_context);
 
-        connectionManager.AddConnection(end_point, socket);
+        connectionManager.AddConnection(end_point, std::make_shared<SocketAdapter>(io_context));
         Paxos pax(connectionManager,3);
 
         io_context.run();

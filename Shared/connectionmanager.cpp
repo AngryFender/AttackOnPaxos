@@ -1,7 +1,7 @@
 #include "connectionmanager.h"
 #include "logger.h"
 
-void ConnectionManager::AddConnection(const tcp::endpoint& endpoint, std::shared_ptr<ISocketAdapter>& socket)
+void ConnectionManager::AddConnection(const tcp::endpoint& endpoint, std::shared_ptr<ISocketAdapter> socket)
 {
     socket->async_connect(endpoint,[socket,this](const error_code& code)
     {
