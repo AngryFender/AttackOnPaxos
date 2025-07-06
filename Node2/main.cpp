@@ -3,7 +3,7 @@
 #include "../Shared/acceptoradapter.h"
 #include "../Shared/paxos.h"
 
-#define PORTNO 3493
+#define LOCAL_PORTNO 3492
 
 void init_logs()
 {
@@ -28,15 +28,16 @@ void init_tcp_server()
 {
     try
     {
-        Log(INFO) << "Starting Server...listening on " << std::to_string(PORTNO).c_str() << "\n";
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        Log(INFO) << "Starting Server...listening on " << std::to_string(LOCAL_PORTNO).c_str() << "\n";
         boost::asio::io_context io_context;
-        ConnectionManager connectionManager(io_context, PORTNO, std::make_shared<AcceptorAdapter>(io_context, PORTNO));
+        ConnectionManager connectionManager(io_context, LOCAL_PORTNO, std::make_shared<AcceptorAdapter>(io_context, LOCAL_PORTNO));
 
         const std::string address = "127.0.0.1";
-        boost::asio::ip::basic_endpoint<tcp> end_point(boost::asio::ip::address::from_string(address), 3490);
+        boost::asio::ip::basic_endpoint<tcp> end_point(boost::asio::ip::address::from_string(address), 3491);
 
         connectionManager.AddConnection(end_point, std::make_shared<SocketAdapter>(io_context));
-        Paxos pax(connectionManager,3);
+        Paxos pax(connectionManager,2);
 
         io_context.run();
     }

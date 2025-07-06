@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.26)
-project(AttackOnPaxos)
+project(Node3)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(AttackOnPaxos main.cpp
+add_executable(Node3 main.cpp
         ../Shared/ilogger.h
         ../Shared/logger.cpp
         ../Shared/logger.h

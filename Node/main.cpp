@@ -3,7 +3,7 @@
 #include "../Shared/acceptoradapter.h"
 #include "../Shared/paxos.h"
 
-#define PORTNO 3491
+#define LOCAL_PORTNO 3491
 
 void init_logs()
 {
@@ -48,25 +48,17 @@ void init_tcp_server()
 {
     try
     {
-        Log(INFO) << "Starting Server...listening on " << std::to_string(PORTNO).c_str() << "\n";
+        Log(INFO) << "Starting Server...listening on " << std::to_string(LOCAL_PORTNO).c_str() << "\n";
         boost::asio::io_context io_context;
-        ConnectionManager connectionManager(io_context, PORTNO, std::make_shared<AcceptorAdapter>(io_context, PORTNO));
+        ConnectionManager connectionManager(io_context, LOCAL_PORTNO, std::make_shared<AcceptorAdapter>(io_context, LOCAL_PORTNO));
 
-        const std::string address = "127.0.0.1";
-        boost::asio::ip::basic_endpoint<tcp> end_point_node2(boost::asio::ip::address::from_string(address), 3490);
-        connectionManager.AddConnection(end_point_node2, std::make_shared<SocketAdapter>(io_context));
-
-        boost::asio::ip::basic_endpoint<tcp> end_point_node3(boost::asio::ip::address::from_string(address), 3493);
-        connectionManager.AddConnection(end_point_node3, std::make_shared<SocketAdapter>(io_context));
-
-        Paxos pax(connectionManager, 2);
-
+        Paxos pax(connectionManager, 1);
         std::thread external_thread([&pax, &io_context]()
         {
+            std::this_thread::sleep_for(std::chrono::seconds(10));
             io_context.post([&pax]()
             {
-                std::this_thread::sleep_for(std::chrono::seconds(10));
-                pax.ContributeValue(70, [](const contribution_status& status)
+                pax.ContributeValue(69, [](const contribution_status& status)
                 {
                     if (status == contribution_status::success)
                     {
