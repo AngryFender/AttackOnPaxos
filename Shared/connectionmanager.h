@@ -33,6 +33,8 @@ public:
     void SetSocketHandlers(std::function<void(const std::shared_ptr<ISocketAdapter>& )> callback) override;
     void ClearAllConnections() override;
 
+    void BroadcastMessage(const std::vector<char>& buffer) override;
+    void ReplyMessage(std::shared_ptr<ISocketAdapter> socket,const std::vector<char>& buffer) override;
 
     ConnectionManager(const ConnectionManager&) = delete;
     ConnectionManager& operator=(const ConnectionManager&) = delete;

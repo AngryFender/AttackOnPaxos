@@ -58,7 +58,7 @@ void SocketAdapter::start_async_receive()
     });
 }
 
-void SocketAdapter::async_send(std::vector<char>& message)
+void SocketAdapter::async_send(const std::vector<char>& message)
 {
     _outbounds.push(message);
 

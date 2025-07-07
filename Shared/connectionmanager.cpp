@@ -81,3 +81,16 @@ void ConnectionManager::ClearAllConnections()
         socket->close();
     }
 }
+
+void ConnectionManager::BroadcastMessage(const std::vector<char>& buffer)
+{
+    for(const auto& pair: _out_connections)
+    {
+        pair.second->async_send(buffer);
+    }
+}
+
+void ConnectionManager::ReplyMessage(std::shared_ptr<ISocketAdapter> socket, const std::vector<char>& buffer)
+{
+
+}

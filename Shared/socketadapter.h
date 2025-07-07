@@ -16,7 +16,7 @@ public:
     void set_receive_callback(std::function<void(const boost::system::error_code&, std::vector<char>& rawData, std::shared_ptr<ISocketAdapter> socket)> callback) override;
     void set_send_callback(std::function<void(const boost::system::error_code&)> callback) override;
     void start_async_receive() override;
-    void async_send(std::vector<char>& message) override;
+    void async_send(const std::vector<char>& message) override;
     void async_connect(const tcp::endpoint& peer_endpoint, const std::function<void(const boost::system::error_code&)> callback) override;
     void close() override;
 private:

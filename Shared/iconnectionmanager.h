@@ -17,5 +17,8 @@ public:
     virtual std::map<std::string, std::shared_ptr<ISocketAdapter>> GetConnections() const = 0;
     virtual void SetSocketHandlers(std::function<void(const std::shared_ptr<ISocketAdapter>&)> callback) = 0;
     virtual void ClearAllConnections() = 0;
+
+    virtual void BroadcastMessage(const std::vector<char>& buffer) = 0;
+    virtual void ReplyMessage(std::shared_ptr<ISocketAdapter> socket,const std::vector<char>& buffer) = 0;
 };
 #endif //ICONNECTIONMANAGER_H

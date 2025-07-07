@@ -135,11 +135,7 @@ void Paxos::SendPrepare(const uint64_t id)
     utility::append_bytes(buffer, p.id);
     utility::append_bytes(buffer, p.type);
 
-    for(const auto& connection_pair: _manager.GetConnections())
-    {
-        const auto socket = connection_pair.second;
-        socket->async_send((buffer));
-    }
+    _manager.BroadcastMessage(buffer);
 
     _local_state = state::Promise;
     _promise_store.clear();
