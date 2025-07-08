@@ -19,6 +19,6 @@ public:
     virtual void ClearAllConnections() = 0;
 
     virtual void BroadcastMessage(const std::vector<char>& buffer) = 0;
-    virtual void ReplyMessage(std::shared_ptr<ISocketAdapter> socket,const std::vector<char>& buffer) = 0;
+    virtual void ReplyMessage(const std::string& address_port, const std::vector<char>& buffer) = 0;
 };
 #endif //ICONNECTIONMANAGER_H

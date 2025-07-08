@@ -90,7 +90,11 @@ void ConnectionManager::BroadcastMessage(const std::vector<char>& buffer)
     }
 }
 
-void ConnectionManager::ReplyMessage(std::shared_ptr<ISocketAdapter> socket, const std::vector<char>& buffer)
+void ConnectionManager::ReplyMessage(const std::string& address_port, const std::vector<char>& buffer)
 {
-
+    if(_out_connections.contains(address_port))
+    {
+        _out_connections[address_port]->async_send(buffer);
+    }
 }
+

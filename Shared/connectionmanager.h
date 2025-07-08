@@ -34,7 +34,7 @@ public:
     void ClearAllConnections() override;
 
     void BroadcastMessage(const std::vector<char>& buffer) override;
-    void ReplyMessage(std::shared_ptr<ISocketAdapter> socket,const std::vector<char>& buffer) override;
+    void ReplyMessage(const std::string& address_port, const std::vector<char>& buffer) override;
 
     ConnectionManager(const ConnectionManager&) = delete;
     ConnectionManager& operator=(const ConnectionManager&) = delete;

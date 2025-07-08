@@ -22,7 +22,7 @@ void Paxos::SetSocketHandlers(const std::shared_ptr<ISocketAdapter>& socket)
     });
 }
 
-void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<char>& data, std::shared_ptr<ISocketAdapter>& socket)
+void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<char>& data, const std::string address_port)
 {
     const std::string address = socket->getSocket().remote_endpoint().address().to_string() + ":" + std::to_string(socket->getSocket().remote_endpoint().port());
     const uint8_t node_id = static_cast<uint8_t>(data[4]);
@@ -144,7 +144,7 @@ void Paxos::SendPrepare(const uint64_t id)
     _response_store.clear();
 }
 
-void Paxos::SendPromise(const uint64_t id, const bool accept, std::shared_ptr<ISocketAdapter> socket)
+void Paxos::SendPromise(const uint64_t id, const bool accept, const std::string address_port)
 {
     Promise p{};
     p.id = utility::htonl64(id);
@@ -159,7 +159,7 @@ void Paxos::SendPromise(const uint64_t id, const bool accept, std::shared_ptr<IS
     utility::append_bytes(buffer, p.type);
     utility::append_bytes(buffer, p.accept);
 
-    socket->async_send((buffer));
+    _manager.ReplyMessage(address_port, buffer);
 }
 
 void Paxos::SendAccept(const uint64_t id, const uint64_t value)
@@ -177,14 +177,10 @@ void Paxos::SendAccept(const uint64_t id, const uint64_t value)
     utility::append_bytes(buffer, a.type);
     utility::append_bytes(buffer, a.value);
 
-    for(const auto& connection_pair: _manager.GetConnections())
-    {
-        const auto& socket = connection_pair.second;
-        socket->async_send(buffer);
-    }
+    _manager.BroadcastMessage(buffer);
 }
 
-void Paxos::SendResponse(uint64_t id, const uint64_t value, const bool accept, std::shared_ptr<ISocketAdapter> socket)
+void Paxos::SendResponse(uint64_t id, const uint64_t value, const bool accept, const std::string address_port)
 {
     Response r{};
     r.id = utility::htonl64(id);
@@ -201,5 +197,5 @@ void Paxos::SendResponse(uint64_t id, const uint64_t value, const bool accept, s
     utility::append_bytes(buffer, r.accept);
     utility::append_bytes(buffer, r.value);
 
-    socket->async_send(buffer);
+    _manager.ReplyMessage(address_port, buffer);
 }

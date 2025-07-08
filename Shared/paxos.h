@@ -27,7 +27,7 @@ public:
      {
           _manager.ClearAllConnections();
      };
-     void ReceivePacket(const boost::system::error_code& error, std::vector<char>& data, std::shared_ptr<ISocketAdapter>& socket) override;
+     void ReceivePacket(const boost::system::error_code& error, std::vector<char>& data, const std::string address_port) override;
      void ContributeValue(const uint64_t value, std::function<void(const contribution_status &)> handler) override;
      void SetSocketHandlers(const std::shared_ptr<ISocketAdapter>& socket) override;
 private:
@@ -43,9 +43,9 @@ private:
      std::function<void(const contribution_status&)> _contribution_handler;
 
      void SendPrepare(const uint64_t id);
-     void SendPromise(const uint64_t id, const bool accept, std::shared_ptr<ISocketAdapter> socket);
+     void SendPromise(const uint64_t id, const bool accept, const std::string address_port);
      void SendAccept(uint64_t id, uint64_t value);
-     void SendResponse(uint64_t id, const uint64_t value, const bool accept, std::shared_ptr<ISocketAdapter> socket);
+     void SendResponse(uint64_t id, const uint64_t value, const bool accept, const std::string address_port);
 };
 
 
