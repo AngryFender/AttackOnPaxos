@@ -4,13 +4,14 @@
 
 #include "iacceptoradapter.h"
 #include "iconnectionmanager.h"
+#include "istrategy.h"
 #include "logger.h"
 
 class ConnectionManager: public IConnectionManager
 {
 public:
-    explicit ConnectionManager(boost::asio::io_context& io_context, const int port, std::shared_ptr<IAcceptorAdapter> adapter): _io_context(io_context),
-        _resolver(io_context), _port(port), _acceptor(std::move(adapter))
+    explicit ConnectionManager(boost::asio::io_context& io_context, const int port, std::shared_ptr<IAcceptorAdapter> adapter, IStrategy* strategy): _resolver(io_context),
+        _port(port), _acceptor(std::move(adapter)), _strategy(_strategy)
     {
         _acceptor->setHandler([this](const std::shared_ptr<ISocketAdapter>& socket)
         {
@@ -46,9 +47,9 @@ private:
     tcp::resolver _resolver;
     const int _port;
     mutable std::shared_mutex _mutex;
-    boost::asio::io_context& _io_context;
     std::map<std::string, std::shared_ptr<ISocketAdapter>> _out_connections;
     std::shared_ptr<IAcceptorAdapter> _acceptor;
+    IStrategy * _strategy;
     std::function<void(const std::shared_ptr<ISocketAdapter>&)> _set_socket_handlers;
 };
 
