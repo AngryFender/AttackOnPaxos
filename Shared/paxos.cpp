@@ -22,6 +22,12 @@ void Paxos::SetSocketHandlers(const std::shared_ptr<ISocketAdapter>& socket)
     });
 }
 
+void Paxos::SetConnectionManger(IConnectionManager* manager)
+{
+    if(manager)
+        _manager = manager;
+}
+
 void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<char>& data, const std::string& address_port)
 {
     const uint8_t node_id = static_cast<uint8_t>(data[4]);
@@ -51,14 +57,14 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
             _promise_store.push_back(accepted);
 
             const int accept_count = std::count(_promise_store.begin(), _promise_store.end(), true);
-            const int majority_count = (_manager.GetConnectionCount() + 1)/2 ;
+            const int majority_count = (_manager->GetConnectionCount() + 1)/2 ;
 
             if (accept_count >= majority_count && _local_state == state::Promise)
             {
                 _local_state = state::Accept;
                 SendAccept(_local_promise_id, _proposed_value);
             }
-            if(accept_count < majority_count && _promise_store.size() == _manager.GetConnectionCount())
+            if(accept_count < majority_count && _promise_store.size() == _manager->GetConnectionCount())
             {
                 SendPrepare(++_local_promise_id);
             }
@@ -91,7 +97,7 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
             _value_store.push_back(value);
 
             const int accept_count = std::count(_response_store.begin(), _response_store.end(), true);
-            const int majority_count = (_manager.GetConnectionCount() + 1)/2 ;
+            const int majority_count = (_manager->GetConnectionCount() + 1)/2 ;
 
             std::map<uint64_t, int> count_values;
             int max_count = 0;
@@ -105,7 +111,7 @@ void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<ch
                 _local_state = state::Prepare;
                 _contribution_handler(contribution_status::success);
             }
-            if(accept_count < majority_count && _promise_store.size() == _manager.GetConnectionCount())
+            if(accept_count < majority_count && _promise_store.size() == _manager->GetConnectionCount())
             {
                 _contribution_handler(contribution_status::consensus_not_met);
             }
@@ -134,7 +140,7 @@ void Paxos::SendPrepare(const uint64_t id)
     utility::append_bytes(buffer, p.id);
     utility::append_bytes(buffer, p.type);
 
-    _manager.BroadcastMessage(buffer);
+    _manager->BroadcastMessage(buffer);
 
     _local_state = state::Promise;
     _promise_store.clear();
@@ -158,7 +164,7 @@ void Paxos::SendPromise(const uint64_t id, const bool accept, const std::string 
     utility::append_bytes(buffer, p.type);
     utility::append_bytes(buffer, p.accept);
 
-    _manager.ReplyMessage(address_port, buffer);
+    _manager->ReplyMessage(address_port, buffer);
 }
 
 void Paxos::SendAccept(const uint64_t id, const uint64_t value)
@@ -176,7 +182,7 @@ void Paxos::SendAccept(const uint64_t id, const uint64_t value)
     utility::append_bytes(buffer, a.type);
     utility::append_bytes(buffer, a.value);
 
-    _manager.BroadcastMessage(buffer);
+    _manager->BroadcastMessage(buffer);
 }
 
 void Paxos::SendResponse(uint64_t id, const uint64_t value, const bool accept, const std::string address_port)
@@ -196,5 +202,5 @@ void Paxos::SendResponse(uint64_t id, const uint64_t value, const bool accept, c
     utility::append_bytes(buffer, r.accept);
     utility::append_bytes(buffer, r.value);
 
-    _manager.ReplyMessage(address_port, buffer);
+    _manager->ReplyMessage(address_port, buffer);
 }
