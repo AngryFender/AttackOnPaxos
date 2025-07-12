@@ -10,14 +10,16 @@
 class ConnectionManager: public IConnectionManager
 {
 public:
-    explicit ConnectionManager(boost::asio::io_context& io_context, const int port, std::shared_ptr<IAcceptorAdapter> adapter, IStrategy* strategy): _resolver(io_context),
-        _port(port), _acceptor(std::move(adapter)), _strategy(_strategy)
+    explicit ConnectionManager(IStrategy* strategy, std::shared_ptr<IAcceptorAdapter> adapter): _strategy(_strategy), _acceptor(std::move(adapter))
     {
+        strategy->SetConnectionManger(this);
+
         _acceptor->setHandler([this](const std::shared_ptr<ISocketAdapter>& socket)
         {
             this->AcceptConnection(socket);
         });
         _acceptor->open();
+
     };
 
     ~ConnectionManager() override
@@ -31,7 +33,6 @@ public:
     int GetConnectionCount() const override;
     std::map<std::string, std::shared_ptr<ISocketAdapter>> GetConnections() const override;
     void AcceptConnection(const std::shared_ptr<ISocketAdapter>&) override;
-    void SetSocketHandlers(std::function<void(const std::shared_ptr<ISocketAdapter>& )> callback) override;
     void ClearAllConnections() override;
 
     void BroadcastMessage(const std::vector<char>& buffer) override;
@@ -44,13 +45,9 @@ public:
     ConnectionManager& operator=(ConnectionManager&&) = delete;
 
 private:
-    tcp::resolver _resolver;
-    const int _port;
-    mutable std::shared_mutex _mutex;
+    IStrategy * _strategy;
     std::map<std::string, std::shared_ptr<ISocketAdapter>> _out_connections;
     std::shared_ptr<IAcceptorAdapter> _acceptor;
-    IStrategy * _strategy;
-    std::function<void(const std::shared_ptr<ISocketAdapter>&)> _set_socket_handlers;
 };
 
 

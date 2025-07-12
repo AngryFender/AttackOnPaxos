@@ -3,34 +3,33 @@
 
 void ConnectionManager::AddConnection(const tcp::endpoint& endpoint, std::shared_ptr<ISocketAdapter> socket)
 {
-    socket->async_connect(endpoint, [endpoint,socket,this](const error_code& code)
+    const std::string address_port = endpoint.address().to_string() + ":" + std::to_string(endpoint.port());
+
+    socket->async_connect(endpoint, [address_port,socket,this](const error_code& code)
     {
-        const std::string address = endpoint.address().to_string() + ":" + std::to_string(endpoint.port());
         if(code)
         {
-            Log(ERROR) << "Unable to connect to " << address.c_str() << " -> " << code.to_string().c_str() << "\n";
+            Log(ERROR) << "Unable to connect to " << address_port.c_str() << " -> " << code.to_string().c_str() << "\n";
             return;
         }
-        std::unique_lock lock(this->_mutex);
-        this->_out_connections[address] = socket;
-        Log(INFO)<<"Connected from "<<socket->getSocket().local_endpoint().address().to_string().c_str() << ":" << std::to_string(socket->getSocket().local_endpoint().port()).c_str()<<" to " << address.c_str()<<"\n";
+        this->_out_connections[address_port] = socket;
+        Log(INFO)<<"Connected from "<<socket->getSocket().local_endpoint().address().to_string().c_str() << ":" << std::to_string(socket->getSocket().local_endpoint().port()).c_str()<<" to " << address_port.c_str()<<"\n";
 
-        if (_set_socket_handlers)
+        socket->set_receive_callback([this, address_port](const error_code& error, std::vector<char>& buffer)
         {
-            _set_socket_handlers(socket);
-        }
+            this->_strategy->ReceivePacket(error, buffer, address_port);
+        });
+        socket->start_async_receive();
     });
 }
 
 void ConnectionManager::RemoveConnection(const std::string address)
 {
-    std::unique_lock lock(_mutex);
     _out_connections.erase(address);
 }
 
 bool ConnectionManager::GetConnection(const std::string address, std::shared_ptr<ISocketAdapter>& socketAdapter) const
 {
-    std::shared_lock lock(_mutex);
     const auto it = _out_connections.find(address);
     if(it != _out_connections.end())
     {
@@ -47,28 +46,22 @@ int ConnectionManager::GetConnectionCount() const
 
 std::map<std::string, std::shared_ptr<ISocketAdapter>> ConnectionManager::GetConnections() const
 {
-    std::shared_lock lock(_mutex);
     return _out_connections;
 }
 
 void ConnectionManager::AcceptConnection(const std::shared_ptr<ISocketAdapter>& socket)
 {
-    const std::string address = socket->getSocket().remote_endpoint().address().to_string() + ":" + std::to_string(socket->getSocket().remote_endpoint().port());
-    if (!_out_connections.contains(address))
+    const std::string address_port = socket->getSocket().remote_endpoint().address().to_string() + ":" + std::to_string(socket->getSocket().remote_endpoint().port());
+    if (!_out_connections.contains(address_port))
     {
-        _out_connections[address] = socket;
-        Log(INFO)<<"Accepting connection from "<<address.c_str()<<"\n";
+        _out_connections[address_port] = socket;
+        Log(INFO)<<"Accepting connection from "<<address_port.c_str()<<"\n";
 
-        if(_set_socket_handlers)
+        socket->set_receive_callback([this, address_port](const error_code& error, std::vector<char>& buffer)
         {
-            _set_socket_handlers(socket);
-        }
-    } 
-}
-
-void ConnectionManager::SetSocketHandlers(std::function<void(const std::shared_ptr<ISocketAdapter>&)> callback)
-{
-    _set_socket_handlers = callback;
+            this->_strategy->ReceivePacket(error, buffer, address_port);
+        });
+    }
 }
 
 void ConnectionManager::ClearAllConnections()
