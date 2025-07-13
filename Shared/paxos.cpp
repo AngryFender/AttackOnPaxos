@@ -4,24 +4,6 @@
 #include "packet.h"
 #include "utility.h"
 
-void Paxos::SetSocketHandlers(const std::shared_ptr<ISocketAdapter>& socket)
-{
-    socket->set_receive_callback([this](const boost::system::error_code& code, std::vector<char>& data, std::shared_ptr<ISocketAdapter> socket)
-    {
-        this->ReceivePacket(code, data, socket);
-    });
-    socket->start_async_receive();
-
-    socket->set_send_callback([](const boost::system::error_code& code)
-    {
-        if (code)
-        {
-            Log(ERROR) << "Sending paxos packet error" << code.message().c_str() << "\n";
-            return;
-        }
-    });
-}
-
 void Paxos::SetConnectionManger(IConnectionManager* manager)
 {
     if(manager)
