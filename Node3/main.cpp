@@ -37,31 +37,33 @@ void init_tcp_server()
         std::this_thread::sleep_for(std::chrono::seconds(4));
         Log(INFO) << "Starting Server...listening on " << std::to_string(LOCAL_PORTNO).c_str() << "\n";
         boost::asio::io_context io_context;
-        ConnectionManager connectionManager(io_context, LOCAL_PORTNO, std::make_shared<AcceptorAdapter>(io_context, LOCAL_PORTNO));
-        Paxos pax(connectionManager,3);
-
+        Paxos pax(3);
+        ConnectionManager connectionManager(&pax, std::make_shared<AcceptorAdapter>(io_context, LOCAL_PORTNO));
         const std::string address = "127.0.0.1";
-        boost::asio::ip::basic_endpoint<tcp> end_point_node2(boost::asio::ip::address::from_string(address), 3491);
+        boost::asio::ip::basic_endpoint<tcp> end_point_node1(boost::asio::ip::address::from_string(address), 3491);
+        connectionManager.AddConnection(end_point_node1, std::make_shared<SocketAdapter>(io_context));
+
+        boost::asio::ip::basic_endpoint<tcp> end_point_node2(boost::asio::ip::address::from_string(address), 3492);
         connectionManager.AddConnection(end_point_node2, std::make_shared<SocketAdapter>(io_context));
 
-        // std::thread external_thread([&pax, &io_context]()
-        // {
-        //     std::this_thread::sleep_for(std::chrono::seconds(5));
-        //     io_context.post([&pax]()
-        //     {
-        //         pax.ContributeValue(70, [](const contribution_status& status)
-        //         {
-        //             if (status == contribution_status::success)
-        //             {
-        //                 Log(INFO) << "Contribution successful\n";
-        //             }
-        //             else
-        //             {
-        //                 Log(INFO) << "Contribution failed\n";
-        //             }
-        //        });
-        //    });
-        // });
+        std::thread external_thread([&pax, &io_context]()
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(10));
+            io_context.post([&pax]()
+            {
+                pax.ContributeValue(70, [](const contribution_status& status)
+                {
+                    if (status == contribution_status::success)
+                    {
+                        Log(INFO) << "Contribution successful\n";
+                    }
+                    else
+                    {
+                        Log(INFO) << "Contribution failed\n";
+                    }
+               });
+           });
+        });
 
         io_context.run();
     }

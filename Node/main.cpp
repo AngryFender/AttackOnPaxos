@@ -50,9 +50,10 @@ void init_tcp_server()
     {
         Log(INFO) << "Starting Server...listening on " << std::to_string(LOCAL_PORTNO).c_str() << "\n";
         boost::asio::io_context io_context;
-        ConnectionManager connectionManager(io_context, LOCAL_PORTNO, std::make_shared<AcceptorAdapter>(io_context, LOCAL_PORTNO));
 
-        Paxos pax(connectionManager, 1);
+        Paxos pax(1);
+        ConnectionManager connectionManager(&pax, std::make_shared<AcceptorAdapter>(io_context, LOCAL_PORTNO));
+
         std::thread external_thread([&pax, &io_context]()
         {
             std::this_thread::sleep_for(std::chrono::seconds(10));

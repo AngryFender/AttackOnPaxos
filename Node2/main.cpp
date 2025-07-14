@@ -31,13 +31,32 @@ void init_tcp_server()
         std::this_thread::sleep_for(std::chrono::seconds(2));
         Log(INFO) << "Starting Server...listening on " << std::to_string(LOCAL_PORTNO).c_str() << "\n";
         boost::asio::io_context io_context;
-        ConnectionManager connectionManager(io_context, LOCAL_PORTNO, std::make_shared<AcceptorAdapter>(io_context, LOCAL_PORTNO));
+        Paxos pax(2);
+        ConnectionManager connectionManager(&pax, std::make_shared<AcceptorAdapter>(io_context, LOCAL_PORTNO));
 
         const std::string address = "127.0.0.1";
         boost::asio::ip::basic_endpoint<tcp> end_point(boost::asio::ip::address::from_string(address), 3491);
 
         connectionManager.AddConnection(end_point, std::make_shared<SocketAdapter>(io_context));
-        Paxos pax(connectionManager,2);
+
+        std::thread external_thread([&pax, &io_context]()
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(20));
+            io_context.post([&pax]()
+            {
+                pax.ContributeValue(71, [](const contribution_status& status)
+                {
+                    if (status == contribution_status::success)
+                    {
+                        Log(INFO) << "Contribution successful\n";
+                    }
+                    else
+                    {
+                        Log(INFO) << "Contribution failed\n";
+                    }
+               });
+           });
+        });
 
         io_context.run();
     }
