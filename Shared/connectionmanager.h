@@ -10,9 +10,9 @@
 class ConnectionManager: public IConnectionManager
 {
 public:
-    explicit ConnectionManager(IStrategy* strategy, std::shared_ptr<IAcceptorAdapter> adapter): _strategy(_strategy), _acceptor(std::move(adapter))
+    explicit ConnectionManager(IStrategy* strategy, std::shared_ptr<IAcceptorAdapter> adapter): _strategy(strategy), _acceptor(std::move(adapter))
     {
-        strategy->SetConnectionManger(this);
+        _strategy->SetConnectionManger(this);
 
         _acceptor->setHandler([this](const std::shared_ptr<ISocketAdapter>& socket)
         {
