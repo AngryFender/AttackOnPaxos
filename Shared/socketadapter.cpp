@@ -7,7 +7,7 @@ tcp::socket& SocketAdapter::getSocket()
     return _socket;
 }
 
-void SocketAdapter::set_receive_callback(std::function<void(const boost::system::error_code&, std::vector<char>& rawData)> callback)
+void SocketAdapter::set_receive_callback(std::function<void(std::vector<char>& rawData)> callback)
 {
     _receive_callback = callback;
 }
@@ -49,7 +49,7 @@ void SocketAdapter::start_async_receive()
         if (utility::parse_message(self->_internal_buff, self->_packet_data))
         {
             //callback the message handler
-            self->_receive_callback(err, self->_packet_data);
+            self->_receive_callback(self->_packet_data);
             self->_packet_data.clear();
         }
 

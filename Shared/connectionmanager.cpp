@@ -15,9 +15,14 @@ void ConnectionManager::AddConnection(const tcp::endpoint& endpoint, std::shared
         this->_out_connections[address_port] = socket;
         Log(INFO)<<"Connected from "<<socket->getSocket().local_endpoint().address().to_string().c_str() << ":" << std::to_string(socket->getSocket().local_endpoint().port()).c_str()<<" to " << address_port.c_str()<<"\n";
 
-        socket->set_receive_callback([this, address_port](const error_code& error, std::vector<char>& buffer)
+        socket->set_receive_callback([this, address_port](std::vector<char>& buffer)
         {
-            this->_strategy->ReceivePacket(error, buffer, address_port);
+            this->_strategy->ReceivePacket(buffer, address_port);
+        });
+        socket->set_send_callback([this, address_port](const error_code& code)
+        {
+            if(code)
+                Log(INFO) << "Unable to send packets to " << address_port.c_str() << "(, error code:)" << code.to_string().c_str() << "\n";
         });
         socket->start_async_receive();
     });
@@ -57,10 +62,16 @@ void ConnectionManager::AcceptConnection(const std::shared_ptr<ISocketAdapter>& 
         _out_connections[address_port] = socket;
         Log(INFO)<<"Accepting connection from "<<address_port.c_str()<<"\n";
 
-        socket->set_receive_callback([this, address_port](const error_code& error, std::vector<char>& buffer)
+        socket->set_receive_callback([this, address_port](std::vector<char>& buffer)
         {
-            this->_strategy->ReceivePacket(error, buffer, address_port);
+            this->_strategy->ReceivePacket(buffer, address_port);
         });
+        socket->set_send_callback([this, address_port](const error_code& code)
+        {
+            if(code)
+                Log(INFO) << "Unable to send packets to " << address_port.c_str() << "(, error code:)" << code.to_string().c_str() << "\n";
+        });
+        socket->start_async_receive();
     }
 }
 

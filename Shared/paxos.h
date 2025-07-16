@@ -20,7 +20,7 @@ public:
 
      ~Paxos() override = default;
      void SetConnectionManger(IConnectionManager* manager) override;
-     void ReceivePacket(const boost::system::error_code& error, std::vector<char>& data, const std::string& address_port) override;
+     void ReceivePacket(std::vector<char>& data, const std::string& address_port) override;
      void ContributeValue(const uint64_t value, std::function<void(const contribution_status &)> handler) override;
 
 private:

@@ -10,7 +10,7 @@ void Paxos::SetConnectionManger(IConnectionManager* manager)
         _manager = manager;
 }
 
-void Paxos::ReceivePacket(const boost::system::error_code& error, std::vector<char>& data, const std::string& address_port)
+void Paxos::ReceivePacket(std::vector<char>& data, const std::string& address_port)
 {
     const uint8_t node_id = static_cast<uint8_t>(data[4]);
     const uint64_t id = utility::ntohl64(utility::bytes_to_uint<uint64_t>(5, 12, data));
