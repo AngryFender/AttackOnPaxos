@@ -34,6 +34,7 @@ private:
      uint64_t _local_value;
      uint64_t _proposed_value;
      std::function<void(const contribution_status&)> _contribution_handler;
+     std::mutex _mutex;
 
      void SendPrepare(const uint64_t id);
      void SendPromise(const uint64_t id, const bool accept, const std::string address_port);

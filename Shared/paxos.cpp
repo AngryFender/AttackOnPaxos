@@ -122,6 +122,7 @@ void Paxos::SendPrepare(const uint64_t id)
     utility::append_bytes(buffer, p.id);
     utility::append_bytes(buffer, p.type);
 
+    std::lock_guard<std::mutex> guard(_mutex);
     _manager->BroadcastMessage(buffer);
 
     _local_state = state::Promise;
@@ -146,6 +147,7 @@ void Paxos::SendPromise(const uint64_t id, const bool accept, const std::string 
     utility::append_bytes(buffer, p.type);
     utility::append_bytes(buffer, p.accept);
 
+    std::lock_guard<std::mutex> guard(_mutex);
     _manager->ReplyMessage(address_port, buffer);
 }
 
@@ -164,6 +166,7 @@ void Paxos::SendAccept(const uint64_t id, const uint64_t value)
     utility::append_bytes(buffer, a.type);
     utility::append_bytes(buffer, a.value);
 
+    std::lock_guard<std::mutex> guard(_mutex);
     _manager->BroadcastMessage(buffer);
 }
 
@@ -184,5 +187,6 @@ void Paxos::SendResponse(uint64_t id, const uint64_t value, const bool accept, c
     utility::append_bytes(buffer, r.accept);
     utility::append_bytes(buffer, r.value);
 
+    std::lock_guard<std::mutex> guard(_mutex);
     _manager->ReplyMessage(address_port, buffer);
 }
