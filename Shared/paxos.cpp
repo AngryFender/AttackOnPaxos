@@ -1,5 +1,5 @@
 #include "paxos.h"
-#include "isocketadapter.h"
+#include "iconnection.h"
 #include "logger.h"
 #include "packet.h"
 #include "utility.h"

@@ -2,7 +2,7 @@
 #define ACCEPTORADAPTER_H
 
 #include "iacceptoradapter.h"
-#include "socketadapter.h"
+#include "connection.h"
 
 class AcceptorAdapter : public IAcceptorAdapter
 {
@@ -11,13 +11,13 @@ public:
         :_io_context(io_context), _acceptor(io_context, tcp::endpoint(tcp::v4(), port))
     {}
     ~AcceptorAdapter() override = default;
-    void setHandler(std::function<void(std::shared_ptr<ISocketAdapter>)> handler) override;
+    void setHandler(std::function<void(std::shared_ptr<IConnection>)> handler) override;
     void open() override;
 
 private:
     boost::asio::io_context& _io_context;
     tcp::acceptor _acceptor;
-    std::function<void(const std::shared_ptr<ISocketAdapter>&)> _accept_handler;
+    std::function<void(const std::shared_ptr<IConnection>&)> _accept_handler;
 };
 
 

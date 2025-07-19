@@ -4,10 +4,10 @@
 
 using boost::asio::ip::tcp;
 
-class ISocketAdapter
+class IConnection
 {
 public:
-    virtual ~ISocketAdapter() = default;
+    virtual ~IConnection() = default;
     virtual tcp::socket& getSocket() = 0;
 
     virtual void set_receive_callback(std::function<void(std::vector<char>&)> callback) = 0;

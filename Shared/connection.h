@@ -2,16 +2,16 @@
 #define SOCKETADAPTER_H
 #include <queue>
 #include <boost/circular_buffer.hpp>
-#include "isocketadapter.h"
+#include "iconnection.h"
 
-class SocketAdapter:public ISocketAdapter, public std::enable_shared_from_this<SocketAdapter> {
+class Connection:public IConnection, public std::enable_shared_from_this<Connection> {
 
 public:
-    explicit SocketAdapter(boost::asio::io_context& io_context): _socket(io_context), _write_in_progress(false), _internal_buff(1024), _temp_data(1024)
+    explicit Connection(boost::asio::io_context& io_context): _socket(io_context), _write_in_progress(false), _internal_buff(1024), _temp_data(1024)
     {
         _write_in_progress = false;
     }
-    ~SocketAdapter() override = default;
+    ~Connection() override = default;
     tcp::socket& getSocket() override;
     void set_receive_callback(std::function<void(std::vector<char>& rawData)> callback) override;
     void set_send_callback(std::function<void(const boost::system::error_code&)> callback) override;

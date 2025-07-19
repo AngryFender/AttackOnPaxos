@@ -1,7 +1,7 @@
 #include "connectionmanager.h"
 #include "logger.h"
 
-void ConnectionManager::AddConnection(const tcp::endpoint& endpoint, std::shared_ptr<ISocketAdapter> socket)
+void ConnectionManager::AddConnection(const tcp::endpoint& endpoint, std::shared_ptr<IConnection> socket)
 {
     const std::string address_port = endpoint.address().to_string() + ":" + std::to_string(endpoint.port());
 
@@ -33,7 +33,7 @@ void ConnectionManager::RemoveConnection(const std::string address)
     _out_connections.erase(address);
 }
 
-bool ConnectionManager::GetConnection(const std::string address, std::shared_ptr<ISocketAdapter>& socketAdapter) const
+bool ConnectionManager::GetConnection(const std::string address, std::shared_ptr<IConnection>& socketAdapter) const
 {
     const auto it = _out_connections.find(address);
     if(it != _out_connections.end())
@@ -49,12 +49,12 @@ int ConnectionManager::GetConnectionCount() const
    return _out_connections.size();
 }
 
-std::map<std::string, std::shared_ptr<ISocketAdapter>> ConnectionManager::GetConnections() const
+std::map<std::string, std::shared_ptr<IConnection>> ConnectionManager::GetConnections() const
 {
     return _out_connections;
 }
 
-void ConnectionManager::AcceptConnection(const std::shared_ptr<ISocketAdapter>& socket)
+void ConnectionManager::AcceptConnection(const std::shared_ptr<IConnection>& socket)
 {
     const std::string address_port = socket->getSocket().remote_endpoint().address().to_string() + ":" + std::to_string(socket->getSocket().remote_endpoint().port());
     if (!_out_connections.contains(address_port))

@@ -14,7 +14,7 @@ public:
     {
         _strategy->SetConnectionManger(this);
 
-        _acceptor->setHandler([this](const std::shared_ptr<ISocketAdapter>& socket)
+        _acceptor->setHandler([this](const std::shared_ptr<IConnection>& socket)
         {
             this->AcceptConnection(socket);
         });
@@ -27,12 +27,12 @@ public:
         ConnectionManager::ClearAllConnections();
     };
 
-    void AddConnection(const tcp::endpoint& endpoint, std::shared_ptr<ISocketAdapter> socket) override;
+    void AddConnection(const tcp::endpoint& endpoint, std::shared_ptr<IConnection> socket) override;
     void RemoveConnection(const std::string address) override;
-    bool GetConnection(const std::string address, std::shared_ptr<ISocketAdapter>& socketAdapter) const override;
+    bool GetConnection(const std::string address, std::shared_ptr<IConnection>& socketAdapter) const override;
     int GetConnectionCount() const override;
-    std::map<std::string, std::shared_ptr<ISocketAdapter>> GetConnections() const override;
-    void AcceptConnection(const std::shared_ptr<ISocketAdapter>&) override;
+    std::map<std::string, std::shared_ptr<IConnection>> GetConnections() const override;
+    void AcceptConnection(const std::shared_ptr<IConnection>&) override;
     void ClearAllConnections() override;
 
     void BroadcastMessage(const std::vector<char>& buffer) override;
@@ -46,7 +46,7 @@ public:
 
 private:
     IStrategy * _strategy;
-    std::map<std::string, std::shared_ptr<ISocketAdapter>> _out_connections;
+    std::map<std::string, std::shared_ptr<IConnection>> _out_connections;
     std::shared_ptr<IAcceptorAdapter> _acceptor;
 };
 

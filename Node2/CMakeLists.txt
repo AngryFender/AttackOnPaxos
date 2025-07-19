@@ -8,9 +8,9 @@ add_executable(Node2 main.cpp
         ../Shared/logger.cpp
         ../Shared/logger.h
         ../Shared/iacceptoradapter.h
-        ../Shared/isocketadapter.h
-        ../Shared/socketadapter.cpp
-        ../Shared/socketadapter.h
+        ../Shared/iconnection.h
+        ../Shared/connection.cpp
+        ../Shared/connection.h
         ../Shared/acceptoradapter.cpp
         ../Shared/acceptoradapter.h
         ../Shared/iconnectionmanager.h

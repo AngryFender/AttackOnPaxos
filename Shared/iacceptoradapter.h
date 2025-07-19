@@ -3,14 +3,14 @@
 #include <functional>
 #include <map>
 #include <memory>
-#include "isocketadapter.h"
+#include "iconnection.h"
 
 using boost::system::error_code;
 class IAcceptorAdapter
 {
 public:
     virtual ~IAcceptorAdapter() = default;
-    virtual void setHandler(std::function<void(std::shared_ptr<ISocketAdapter>)> handler) = 0;
+    virtual void setHandler(std::function<void(std::shared_ptr<IConnection>)> handler) = 0;
     virtual void open() = 0;
 };
 

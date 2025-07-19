@@ -37,7 +37,7 @@ void init_tcp_server()
         const std::string address = "127.0.0.1";
         boost::asio::ip::basic_endpoint<tcp> end_point(boost::asio::ip::address::from_string(address), 3491);
 
-        connectionManager.AddConnection(end_point, std::make_shared<SocketAdapter>(io_context));
+        connectionManager.AddConnection(end_point, std::make_shared<Connection>(io_context));
 
         std::thread external_thread([&pax, &io_context]()
         {

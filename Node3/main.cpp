@@ -41,10 +41,10 @@ void init_tcp_server()
         ConnectionManager connectionManager(&pax, std::make_shared<AcceptorAdapter>(io_context, LOCAL_PORTNO));
         const std::string address = "127.0.0.1";
         boost::asio::ip::basic_endpoint<tcp> end_point_node1(boost::asio::ip::address::from_string(address), 3491);
-        connectionManager.AddConnection(end_point_node1, std::make_shared<SocketAdapter>(io_context));
+        connectionManager.AddConnection(end_point_node1, std::make_shared<Connection>(io_context));
 
         boost::asio::ip::basic_endpoint<tcp> end_point_node2(boost::asio::ip::address::from_string(address), 3492);
-        connectionManager.AddConnection(end_point_node2, std::make_shared<SocketAdapter>(io_context));
+        connectionManager.AddConnection(end_point_node2, std::make_shared<Connection>(io_context));
 
         std::thread external_thread([&pax, &io_context]()
         {

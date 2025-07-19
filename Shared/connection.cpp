@@ -1,33 +1,33 @@
-#include "socketadapter.h"
+#include "connection.h"
 #include "logger.h"
 #include "utility.h"
 #include "boost/asio/write.hpp"
-tcp::socket& SocketAdapter::getSocket()
+tcp::socket& Connection::getSocket()
 {
     return _socket;
 }
 
-void SocketAdapter::set_receive_callback(std::function<void(std::vector<char>& rawData)> callback)
+void Connection::set_receive_callback(std::function<void(std::vector<char>& rawData)> callback)
 {
     _receive_callback = callback;
 }
 
-void SocketAdapter::set_send_callback(std::function<void(const boost::system::error_code&)> callback)
+void Connection::set_send_callback(std::function<void(const boost::system::error_code&)> callback)
 {
     _send_callback = callback;
 }
 
-void SocketAdapter::async_connect(const tcp::endpoint& peer_endpoint,const std::function<void(const boost::system::error_code&)> callback)
+void Connection::async_connect(const tcp::endpoint& peer_endpoint,const std::function<void(const boost::system::error_code&)> callback)
 {
     _socket.async_connect( peer_endpoint, callback);
 }
 
-void SocketAdapter::close()
+void Connection::close()
 {
     _socket.close();
 }
 
-void SocketAdapter::start_async_receive()
+void Connection::start_async_receive()
 {
     auto self = shared_from_this();
     _socket.async_read_some(boost::asio::buffer(_temp_data),[self](const boost::system::error_code& err, std::size_t size)
@@ -58,7 +58,7 @@ void SocketAdapter::start_async_receive()
     });
 }
 
-void SocketAdapter::async_send(const std::vector<char>& message)
+void Connection::async_send(const std::vector<char>& message)
 {
     _outbounds.push(message);
 
@@ -69,7 +69,7 @@ void SocketAdapter::async_send(const std::vector<char>& message)
     }
 }
 
-void SocketAdapter::start_async_send()
+void Connection::start_async_send()
 {
     auto self = shared_from_this();
     const auto buffer = boost::asio::buffer(_outbounds.front());
