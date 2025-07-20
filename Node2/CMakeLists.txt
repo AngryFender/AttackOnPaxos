@@ -23,6 +23,7 @@ add_executable(Node2 main.cpp
         ../Shared/paxos.h
         ../Shared/packet.h
         ../Shared/utility.h
+        ../Shared/iheartbeat.h
 )
 
 find_package(Boost 1.74.0 REQUIRED)
