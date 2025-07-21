@@ -2,12 +2,9 @@
 #include "connection.h"
 #include "../Shared/logger.h"
 
-void AcceptorAdapter::setHandler(std::function<void(std::shared_ptr<ISocketAdapter>)> handler)
+void AcceptorAdapter::setHandler(std::function<void(std::shared_ptr<IConnection>)> handler)
 {
-    if (handler)
-    {
-        _accept_handler = handler;
-    }
+    _accept_handler = handler;
 }
 
 void AcceptorAdapter::open()

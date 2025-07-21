@@ -24,6 +24,8 @@ add_executable(Node3 main.cpp
         ../Shared/packet.h
         ../Shared/utility.h
         ../Shared/iheartbeat.h
+        ../Shared/heartbeat.cpp
+        ../Shared/heartbeat.h
 )
 
 find_package(Boost 1.74.0 REQUIRED)
