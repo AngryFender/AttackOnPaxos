@@ -9,6 +9,9 @@ public:
     virtual void Start() = 0;
     virtual void Stop() = 0;
     virtual void SetHandler(std::function<void()> handler) = 0;
+    virtual void StartAckTimeout() = 0;
+    virtual void CancelAckTimeout() = 0;
+    virtual void SetAckTimeoutHandler(std::function<void()> handler) = 0;
 };
 
 #endif //IHEARTBEAT_H
