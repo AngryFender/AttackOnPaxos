@@ -6,9 +6,9 @@ class IHeartbeat
 {
 public:
     virtual ~IHeartbeat() = default;
-    virtual void Start() = 0;
-    virtual void Stop() = 0;
-    virtual void SetHandler(std::function<void()> handler) = 0;
+    virtual void StartHeartbeat() = 0;
+    virtual void StopHeartbeat() = 0;
+    virtual void SetHeartbeatHandler(std::function<void()> handler) = 0;
     virtual void StartAckTimeout() = 0;
     virtual void CancelAckTimeout() = 0;
     virtual void SetAckTimeoutHandler(std::function<void()> handler) = 0;

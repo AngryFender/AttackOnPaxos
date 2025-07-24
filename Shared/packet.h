@@ -4,7 +4,7 @@
 
 enum class state:int8_t
 {
-    Prepare = 0,
+    Prepare = 100,
     Promise,
     Accept,
     Response

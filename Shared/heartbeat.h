@@ -8,19 +8,28 @@
 class Heartbeat: public IHeartbeat
 {
 public:
-    explicit Heartbeat(boost::asio::io_context &io_context, const int milliseconds): _io_context(io_context), _timer(io_context), _milliseconds(milliseconds)
+    explicit Heartbeat(boost::asio::io_context& io_context, const int heartbeat_milliseconds, const int ack_milliseconds):
+                                                    _heartbeat_timer(io_context),
+                                                    _ack_timer(io_context),
+                                                    _heartbeat_milliseconds(heartbeat_milliseconds),
+                                                    _ack_milliseconds(ack_milliseconds)
     {
     }
 
     ~Heartbeat() override = default;
-    void Start() override;
-    void Stop() override;
-    void SetHandler(std::function<void()> handler) override;
+    void StartHeartbeat() override;
+    void StopHeartbeat() override;
+    void SetHeartbeatHandler(std::function<void()> handler) override;
+    void StartAckTimeout() override;
+    void CancelAckTimeout() override;
+    void SetAckTimeoutHandler(std::function<void()> handler) override;
 private:
-    boost::asio::io_context& _io_context;
-    boost::asio::steady_timer _timer;
-    int _milliseconds;
-    std::function<void()> _handler;
+    boost::asio::steady_timer _heartbeat_timer;
+    boost::asio::steady_timer _ack_timer;
+    int _heartbeat_milliseconds;
+    int _ack_milliseconds;
+    std::function<void()> _heartbeat_handler;
+    std::function<void()> _ack_handler;
 };
 
 
