@@ -1,21 +1,47 @@
 #include "heartbeat.h"
 
-void Heartbeat::Start()
+void Heartbeat::StartHeartbeat()
 {
-    _timer.expires_after(std::chrono::milliseconds(_milliseconds));
-    _timer.async_wait([this](const boost::system::error_code& code)
+    _heartbeat_timer.expires_after(std::chrono::milliseconds(_heartbeat_milliseconds));
+    auto self = shared_from_this();
+    _heartbeat_timer.async_wait([self](const boost::system::error_code& code)
     {
-        this->_handler();
-        this->Start();
+        if(self->_heartbeat_handler)
+        {
+            self->_heartbeat_handler();
+        }
+        self->StartHeartbeat();
     });
 }
 
-void Heartbeat::Stop()
+void Heartbeat::StopHeartbeat()
 {
-    _timer.cancel();
+    _heartbeat_timer.cancel();
 }
 
-void Heartbeat::SetHandler(std::function<void()> handler)
+void Heartbeat::SetHeartbeatHandler(std::function<void()> handler)
 {
-    _handler = handler;
+    _heartbeat_handler = handler;
+}
+
+void Heartbeat::StartAckTimeout()
+{
+    _ack_timer.expires_after(std::chrono::milliseconds(_ack_milliseconds));
+    auto self = shared_from_this();
+    _ack_timer.async_wait([self](const boost::system::error_code& code)
+    {
+        if(self->_ack_handler)
+        {
+            self->_ack_handler();
+        }
+    });}
+
+void Heartbeat::CancelAckTimeout()
+{
+    _ack_timer.cancel();
+}
+
+void Heartbeat::SetAckTimeoutHandler(std::function<void()> handler)
+{
+    _ack_handler = handler;
 }

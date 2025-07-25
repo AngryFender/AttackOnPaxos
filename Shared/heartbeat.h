@@ -5,7 +5,7 @@
 #include <boost/asio/steady_timer.hpp>
 #include "iheartbeat.h"
 
-class Heartbeat: public IHeartbeat
+class Heartbeat: public IHeartbeat, std::enable_shared_from_this<Heartbeat>
 {
 public:
     explicit Heartbeat(boost::asio::io_context& io_context, const int heartbeat_milliseconds, const int ack_milliseconds):
