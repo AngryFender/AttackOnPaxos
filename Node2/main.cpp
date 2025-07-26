@@ -1,9 +1,12 @@
 #include <iostream>
 #include "../Shared/connectionmanager.h"
 #include "../Shared/acceptoradapter.h"
+#include "../Shared/heartbeat.h"
 #include "../Shared/paxos.h"
 
 #define LOCAL_PORTNO 3492
+#define HEARTBEAT_TIMEOUT 1000
+#define ACK_TIMEOUT 1000
 
 void init_logs()
 {
@@ -37,7 +40,7 @@ void init_tcp_server()
         const std::string address = "127.0.0.1";
         boost::asio::ip::basic_endpoint<tcp> end_point(boost::asio::ip::address::from_string(address), 3491);
 
-        connectionManager.AddConnection(end_point, std::make_shared<Connection>(io_context));
+        connectionManager.AddConnection(end_point, std::make_shared<Connection>(io_context, std::make_shared<Heartbeat>(io_context, HEARTBEAT_TIMEOUT, ACK_TIMEOUT)));
 
         std::thread external_thread([&pax, &io_context]()
         {
