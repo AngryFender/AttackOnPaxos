@@ -4,6 +4,8 @@
 #include "../Shared/paxos.h"
 
 #define LOCAL_PORTNO 3491
+#define HEARTBEAT_TIMEOUT 1000
+#define ACK_TIMEOUT 1000
 
 void init_logs()
 {
@@ -52,7 +54,7 @@ void init_tcp_server()
         boost::asio::io_context io_context;
 
         Paxos pax(1);
-        ConnectionManager connectionManager(&pax, std::make_shared<AcceptorAdapter>(io_context, LOCAL_PORTNO));
+        ConnectionManager connectionManager(&pax, std::make_shared<AcceptorAdapter>(io_context, LOCAL_PORTNO, HEARTBEAT_TIMEOUT, ACK_TIMEOUT));
 
         std::thread external_thread([&pax, &io_context]()
         {
