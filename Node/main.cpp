@@ -74,7 +74,6 @@ void init_tcp_server()
                 });
             });
         });
-
         // boost::asio::deadline_timer timer(io_context, boost::posix_time::seconds(5));
         // timer.async_wait([&pax, &timer](const boost::system::error_code&)
         // {
@@ -82,6 +81,7 @@ void init_tcp_server()
         // });
         //
         io_context.run();
+        external_thread.join();
     }
     catch (std::exception& e)
     {

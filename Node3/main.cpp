@@ -69,6 +69,7 @@ void init_tcp_server()
         });
 
         io_context.run();
+        external_thread.join();
     }
     catch (std::exception& e)
     {
